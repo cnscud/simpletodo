@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>BoardWindow.qml</file>
+        <file>media/done.png</file>
+        <file>media/new.png</file>
+        <file>media/todo.ico</file>
+        <file>media/todo.png</file>
+        <file>media/working.png</file>
+        <file>MyModel.qml</file>
+        <file>BoardTitleSection.qml</file>
+        <file>FootOpSection.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>MainSection.qml</file>
+    </qresource>
+</RCC>
