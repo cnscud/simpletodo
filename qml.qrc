@@ -12,5 +12,6 @@
         <file>FootOpSection.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>MainSection.qml</file>
+        <file>CoodMenu.qml</file>
     </qresource>
 </RCC>

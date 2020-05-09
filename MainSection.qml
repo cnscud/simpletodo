@@ -22,6 +22,7 @@ Rectangle {
             width: itemRoot.width
             
             height: itemRect.height
+
             anchors {
                 left: parent.left
                 right: parent.right
@@ -34,21 +35,35 @@ Rectangle {
             drag.target: itemRect
             drag.axis: Drag.YAxis
             
-            
+            //右键菜单
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+
             
             onClicked: {
                 console.debug("onClicked")
                 
-                //方法1: 设置当前
-                listView.currentIndex = index
-                
-                console.log(("MouseArea Click listview currentIndex: "
-                             + listView.currentIndex + " index: " + index))
-                console.log(("MouseArea Click ListView isCurrentItem: "
-                             + ListView.isCurrentItem))
-                
-                // 在onFocusChanged 中设置了, 此处不需要了
-                //textinput.focus = true;
+                //右键菜单
+                if (mouse.button === Qt.RightButton){
+                    contextMenu.popup()
+                }
+                else {
+
+                    //方法1: 设置当前
+                    listView.currentIndex = index;
+
+                    //禁止右键菜单
+                    contextMenu.enabled = false;
+                    mouseArea.acceptedButtons = Qt.LeftButton;
+
+                    //console.log(("MouseArea Click listview currentIndex: "                                 + listView.currentIndex + " index: " + index))
+                    //console.log(("MouseArea Click ListView isCurrentItem: "                                 + ListView.isCurrentItem))
+
+                    // 在onFocusChanged 中设置了, 此处不需要了
+                    //textinput.focus = true;
+
+                }
+
+
             }
             
             
@@ -82,6 +97,40 @@ Rectangle {
                 }
             }
             
+            //添加新任务, 删除当前, 标记为完成/进行中/初始状态, 设置文字颜色
+            CoodMenu {
+                  id: contextMenu
+                  itemWidth: 180
+
+                  Action { text: "新增一个任务"
+                      //checkable: true
+                      //checked: true
+                  }
+                  Action { text: "删除当前任务"
+                      //checkable: true
+                  }
+                  CoodMenu {
+                        title: "标记状态为"
+
+                        Action { text: "未开始" }
+                        Action { text: "进行中" }
+                        Action { text: "已完成" }
+                        Action { text: "已归档" }
+                  }
+
+                  MenuSeparator { }
+
+                  CoodMenu {
+                        title: "字体设置"
+
+                        Action { text: "黑体" }
+                        Action { text: "斜体" }
+                        Action { text: "下划线" }
+                        Action { text: "选择颜色..." }
+                  }
+            }
+
+
             //实际显示内容
             Rectangle {
                 id: itemRect
@@ -186,7 +235,11 @@ Rectangle {
                             
                             //方法1: 设置index
                             if (listView.currentIndex == index) {
-                                listView.currentIndex = -1
+                                listView.currentIndex = -1;
+
+                                //恢复右键菜单
+                                contextMenu.enabled = true;
+                                mouseArea.acceptedButtons = Qt.LeftButton | Qt.RightButton;
                             }
                             
                             console.log(("TextInput listview currentIndex: "
