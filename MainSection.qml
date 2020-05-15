@@ -4,10 +4,14 @@ import QtQuick.Window 2.3
 import QtQuick.Dialogs 1.1
 import QtQml.Models 2.1
 
+import StrikeTodo 1.0
+
+
 Rectangle {
     id: itemRoot
 
     property alias pListView: listView
+    property StrikeListModel listModel
 
     
     //调试显示
@@ -128,6 +132,7 @@ Rectangle {
                         Action { text: "下划线" }
                         Action { text: "选择颜色..." }
                   }
+
             }
 
 
@@ -175,8 +180,8 @@ Rectangle {
                     //底部留点空间
                     bottomPadding: 3
                     
-                    checked: model.done
-                    onClicked: model.done = checked
+                    checked: model.status === 2
+                    onClicked: { model.status = 2 }
                 }
                 
                 Rectangle {
@@ -189,7 +194,7 @@ Rectangle {
                     Text {
                         id: textShow
                         
-                        text: model.description
+                        text: model.desc
                         anchors.bottom: parent.bottom
                         
                         //控制可见: 不是当前
@@ -210,7 +215,7 @@ Rectangle {
                         //底部留点空间
                         bottomPadding: 3
                         
-                        text: model.description
+                        text: model.desc
                         
                         //控制是否编辑状态
                         visible: mouseArea.ListView.isCurrentItem
@@ -231,7 +236,7 @@ Rectangle {
                         
                         onEditingFinished: {
                             console.debug("=== start onEditingFinished ")
-                            model.description = textinput.text
+                            model.desc = textinput.text
                             
                             //方法1: 设置index
                             if (listView.currentIndex == index) {
@@ -299,7 +304,7 @@ Rectangle {
     DelegateModel {
         id: visualModel
         
-        model: MyModel {}
+        model: listModel
         delegate: delegateItem
     }
     

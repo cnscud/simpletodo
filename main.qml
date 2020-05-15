@@ -8,19 +8,19 @@ Item {
     Instantiator {
         id: windowInstantiator
 
+        model: windowModel
+        /*
         model: ListModel {
             id: windowModel
             ListElement {
                 title: "Initial Window"
                 x: -200
             }
-            /*
             ListElement {
                 title: "Second Window"
                 x: 300
             }
-            */
-        }
+        }*/
 
         delegate: BoardWindow {
             id: window

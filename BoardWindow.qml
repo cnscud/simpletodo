@@ -14,7 +14,7 @@ Window {
     visible: true
     width: 320
     height: 600
-    x: Screen.width / 2 - window.width / 2 + model.x
+    x: Screen.width / 2 - window.width / 2
     y: Screen.height / 2 - window.height / 2
 
 
@@ -26,6 +26,7 @@ Window {
         id: titleOpRect
         pListView: itemRoot.pListView
         title: model.title
+        listModel: model.strikeListModel
     }
 
 
@@ -36,6 +37,7 @@ Window {
         anchors.top: titleOpRect.bottom
         width: parent.width
         height: parent.height - titleOpRect.height - footOpRect.height
+        listModel: model.strikeListModel
     }
 
 

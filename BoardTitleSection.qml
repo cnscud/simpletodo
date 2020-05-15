@@ -4,6 +4,9 @@ import QtQuick.Window 2.3
 import QtQuick.Dialogs 1.1
 import QtQml.Models 2.1
 
+import StrikeTodo 1.0
+
+
 //Todo: Model 用来设置关闭, 设置标题: 双向数据联动
 
 /**
@@ -20,8 +23,9 @@ Rectangle {
 
     //父窗口的ListView
     property ListView pListView
+    property StrikeListModel listModel
 
-    property string title;
+    property string title : "Hello Board";
 
 
 
@@ -74,7 +78,7 @@ Rectangle {
         }
     }
     
-    //Todo 可修改
+    //Todo 标题可修改
     Label {
         id: boardTitleLbl
         //从model中读取 Todo
@@ -105,11 +109,11 @@ Rectangle {
             //messageDialog.open();
             
             var c = pListView.count
-            //插入在第一个
-            pListView.model.model.insert(0, {
-                                            "description": "Buy a new book " + (c + 1),
-                                            "done": false
-                                        })
+
+            //这样调用: 是最佳方法吗?
+            listModel.newStrike();
+
+            //pListView.model.model.insert(0, {"description": "Buy a new book " + (c + 1),"done": false })
             
             //设置焦点, 否则listView就没焦点了
             pListView.focus = true;

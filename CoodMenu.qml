@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 
 /**
-  自定义样式的菜单. (Cood就是想不出名字的缩写, 用作自定义样式的控件)
+  自定义样式的菜单. (Cood = Cool+Good, 用作自定义样式的控件)
 
   Todo: 选择框和 文字之间的间距问题
 */
@@ -115,9 +115,3 @@ Menu {
 
 
 }
-
-/*##^##
-Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
-##^##*/

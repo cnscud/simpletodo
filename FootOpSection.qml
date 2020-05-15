@@ -32,6 +32,7 @@ Rectangle {
         anchors.bottom: parent.bottom
 
         onClicked: {
+            //FIXME: just for test
             windowModel.append({
                                    "title": "Window #" + (windowModel.count + 1)
                                })
