@@ -43,9 +43,11 @@ class StrikeListModel : public QAbstractListModel
   // Remove data:
   bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
-  // 在QML里直接调用来生成一个新行
-  Q_INVOKABLE bool newStrike();
+  Q_INVOKABLE bool moveRow(int sourceRow, int destRow);
 
+  // 在QML里直接调用来生成一个新行
+  Q_INVOKABLE bool addStrike();
+  Q_INVOKABLE bool removeStrike(int index);
 
 
   QList<Strike*> strikes() const;

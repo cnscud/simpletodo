@@ -2,6 +2,7 @@
 #include "strikelistmodel.h"
 #include "boardwindowlistmodel.h"
 
+#include <QApplication>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -11,6 +12,9 @@ int main(int argc, char *argv[])
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
   QGuiApplication app(argc, argv);
+
+  //所有窗口关闭程序也不退出 Todo 最后打开 而且应该提示用户
+  //QApplication::setQuitOnLastWindowClosed(false);
 
   //start data ============================================
   //手工模拟数据
@@ -87,7 +91,7 @@ int main(int argc, char *argv[])
           QCoreApplication::exit(-1);
       }, Qt::QueuedConnection);
 
-  //监听数据变化, 实时保存 Todo
+  //Todo 监听数据变化, 实时保存 : Board, StrikeList 等等
   //QObject::connect(&model, &ToDoModel::dataChanged, &dataMan, &DataManager::saveData);
 
 

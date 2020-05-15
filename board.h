@@ -65,7 +65,7 @@ private:
   QString backColor = "#000000"; //背景色
   bool hiddenArchived = false; //是否隐藏归档的任务
 
-  QDateTime created = QDateTime::fromString("2000-01-01 12:00:00"); //创建时间: 应该设置为1970 Todo
+  QDateTime created = QDateTime::fromString("2000-01-01 12:00:00"); //创建时间
   QDateTime updated = QDateTime::fromString("2000-01-01 12:00:00"); //更新时间
 
   int windowX= 100; //窗口X坐标, 启动时要检查窗口, 不合适则自动重置

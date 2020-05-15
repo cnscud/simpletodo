@@ -6,8 +6,6 @@ StrikeListModel::StrikeListModel(QObject *parent)
 }
 
 int StrikeListModel::rowCount(const QModelIndex &parent) const {
-        // For list models only the root node (an invalid parent) should return the list's size. For all
-        // other (valid) parents, rowCount() should return 0 so that it does not become a tree model.
         if(parent.isValid())
                 return 0;
 
@@ -45,6 +43,9 @@ bool StrikeListModel::setData(const QModelIndex &index, const QVariant &value, i
         if(data(index, role) != value) {
                 Strike* strike = m_strikes.at(index.row());
 
+                //总是更新最新更新时间
+                strike->setUpdated(QDateTime::currentDateTime());
+
                 switch(role) {
                         case SidRole:
                                 strike->setSid(value.toString());
@@ -70,7 +71,10 @@ bool StrikeListModel::setData(const QModelIndex &index, const QVariant &value, i
                 }
 
                 //debug
-                qDebug("[StrikeListModel]Data changed %d value: %ls", role, qUtf16Printable(value.toString()));
+                QHash<int, QByteArray> names = roleNames();
+                QString roleName = QString::fromUtf8(names[role]);
+
+                qDebug("[StrikeListModel]Data changed %s  value %s", qUtf8Printable(roleName), qUtf8Printable(value.toString()));
 
                 emit dataChanged(index, index, QVector<int>() << role);
                 return true;
@@ -83,7 +87,7 @@ Qt::ItemFlags StrikeListModel::flags(const QModelIndex &index) const {
                 return Qt::NoItemFlags;
 
         //Todo 看看效果 Selectable
-        return Qt::ItemIsEditable | Qt::ItemIsSelectable;
+        return Qt::ItemIsEditable | Qt::ItemIsSelectable ;
 }
 
 QHash<int, QByteArray> StrikeListModel::roleNames() const {
@@ -124,7 +128,39 @@ bool StrikeListModel::removeRows(int row, int count, const QModelIndex &parent) 
         return true;
 }
 
-bool StrikeListModel::newStrike() {
+bool StrikeListModel::moveRow(int sourceRow, int destRow) {
+        if(sourceRow == destRow) {
+                return false;
+        }
+
+        int oldDestRow = destRow;
+        qDebug("======moveRow --- sourceRow: %d destRow: %d", sourceRow, oldDestRow);
+
+
+        //向下移动有问题 moveRow 需要加工
+        //see https://forum.qt.io/topic/95879/endmoverows-in-model-crashes-my-app
+        //see https://www.qtcentre.org/threads/43640-beginMoveRows-working-down-to-up-but-not-up-to-down-Any-insignt-would-be-great
+        if(sourceRow < destRow){
+          destRow++;
+        }
+        if(destRow > rowCount()){
+          destRow = rowCount();
+        }
+
+
+        if(!beginMoveRows(QModelIndex(), sourceRow, sourceRow, QModelIndex(), destRow))
+                return false;
+
+        //数据移动
+        m_strikes.move(sourceRow, oldDestRow);
+        qDebug("======Done moveRow --- sourceRow: %d destRow: %d ->lastDestRow: %d", sourceRow, oldDestRow, destRow);
+
+        endMoveRows();
+
+        return true;
+}
+
+bool StrikeListModel::addStrike() {
         insertRows(0, 1, QModelIndex());
 
         QModelIndex qi = index(0, 0);
@@ -134,6 +170,13 @@ bool StrikeListModel::newStrike() {
         setData(qi, QDateTime::currentDateTime(), CreatedRole);
         setData(qi, QDateTime::currentDateTime(), UpdatedRole);
 
+        return true;
+}
+
+bool StrikeListModel::removeStrike(int index) {
+        //Todo 如何通知数据管理员数据已经更新了哪?
+
+        removeRows(index, 1, QModelIndex());
         return true;
 }
 

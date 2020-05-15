@@ -53,6 +53,10 @@ Rectangle {
             //如果mainwindow继承自QWidget,用setPos
             window.setX(window.x + delta.x)
             window.setY(window.y + delta.y)
+
+            //保存窗口位置
+            model.windowX = window.x;
+            model.windowY = window.y;
         }
     }
     
@@ -78,10 +82,9 @@ Rectangle {
         }
     }
     
-    //Todo 标题可修改
+    //Todo 标题可编辑修改
     Label {
         id: boardTitleLbl
-        //从model中读取 Todo
         text: title
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 5
@@ -111,7 +114,7 @@ Rectangle {
             var c = pListView.count
 
             //这样调用: 是最佳方法吗?
-            listModel.newStrike();
+            listModel.addStrike();
 
             //pListView.model.model.insert(0, {"description": "Buy a new book " + (c + 1),"done": false })
             

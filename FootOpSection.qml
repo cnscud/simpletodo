@@ -32,7 +32,7 @@ Rectangle {
         anchors.bottom: parent.bottom
 
         onClicked: {
-            //FIXME: just for test
+            //Todo: just for test 新增新窗口
             windowModel.append({
                                    "title": "Window #" + (windowModel.count + 1)
                                })
@@ -51,16 +51,42 @@ Rectangle {
         cursorShape: Qt.SizeFDiagCursor
 
         property point clickPos: "1,1"
+        //property int oldWidth
+        //property int oldHeight
+
+        //保持窗口左上角不动
+        property int oldX
+        property int oldY
 
         onPressed: {
-            resize.clickPos = Qt.point(mouse.x, mouse.y)
+            clickPos = Qt.point(mouse.x, mouse.y)
+            //oldWidth = window.width
+            //oldHeight = window.height
+            oldX = window.x
+            oldY = window.y
         }
 
         onPositionChanged: {
-            var delta = Qt.point(mouse.x - resize.clickPos.x,
-                                 mouse.y - resize.clickPos.y)
-            window.width += delta.x
-            window.height += delta.y
+            var delta = Qt.point(mouse.x - clickPos.x,
+                                 mouse.y - clickPos.y)
+
+            var minWidth = 100;
+            var minHeight = 100;
+
+            //最小
+            var newWidth = (window.width + delta.x)<minWidth?minWidth:(window.width + delta.x);
+
+            //最小
+            var newHeight = (window.height + delta.y)<minHeight?minHeight:(window.height + delta.y);
+
+            window.width = newWidth;
+            window.height = newHeight;
+            window.x = oldX
+            window.y = oldY
+
+            //保存: 窗口大小
+            model.windowWidth = window.width;
+            model.windowHeight = window.height;
         }
 
         onReleased: {

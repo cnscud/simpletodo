@@ -73,22 +73,26 @@ Rectangle {
             
             onFocusChanged: {
                 if (focus) {
+                    /*
                     console.debug("=====got focus of mouseArea, start")
                     console.debug(("got focus of mouseArea, listview currentIndex: "
                                    + listView.currentIndex + " index: " + index))
                     console.debug("got focus of mouseArea, isCurrentItem: " +  mouseArea.ListView.isCurrentItem)
                     console.debug("got focus of mouseArea, drag is active: " + drag.active)
                     console.debug("got focus of mouseArea, textInput visible: " + textinput.visible)
+                    */
                     
                     textinput.focus = true
                     
-                    console.debug("=====got focus of mouseArea, end!")
+                    //console.debug("=====got focus of mouseArea, end!")
                 }
                 else {
+                    /*
                     console.debug(("lost focus of mouseArea, listview currentIndex: "
                                    + listView.currentIndex + " index: " + index))
                     
                     console.debug("lost focus of mouseArea, isCurrentItem: " +  mouseArea.ListView.isCurrentItem)
+                    */
                 }
             }
             
@@ -100,18 +104,35 @@ Rectangle {
                     listView.currentIndex = -1
                 }
             }
-            
+
+            //字体颜色选择
+            ColorDialog {
+                id: colorDialog
+                modality: Qt.ApplicationModal
+
+                title: "请选择字体的颜色"
+                      onAccepted: {
+                          console.log("You chose: " + colorDialog.color)
+                          textShow.color = color;
+                          model.textColor = color;
+                      }
+                      onRejected: {
+                          console.log("Canceled")
+                }
+                //Component.onCompleted: visible = true
+
+            }
+
             //添加新任务, 删除当前, 标记为完成/进行中/初始状态, 设置文字颜色
             CoodMenu {
                   id: contextMenu
                   itemWidth: 180
 
-                  Action { text: "新增一个任务"
-                      //checkable: true
-                      //checked: true
-                  }
                   Action { text: "删除当前任务"
-                      //checkable: true
+                      onTriggered: {
+                          console.debug("remove row " + index);
+                          listModel.removeStrike(index);
+                      }
                   }
                   CoodMenu {
                         title: "标记状态为"
@@ -127,10 +148,39 @@ Rectangle {
                   CoodMenu {
                         title: "字体设置"
 
-                        Action { text: "黑体" }
-                        Action { text: "斜体" }
-                        Action { text: "下划线" }
-                        Action { text: "选择颜色..." }
+                        Action { text: "黑体"
+                            onTriggered: {
+                                textShow.font.bold = !textShow.font.bold ;
+                                model.fontStyle =
+                                        (textShow.font.bold?"bold,":"" )
+                                        + ( textShow.font.italic?"italic.":"")
+                                        + ( textShow.font.underline?"underline,":"");
+                            }
+                        }
+                        Action { text: "斜体";
+                            onTriggered: {
+                                textShow.font.italic = !textShow.font.italic;
+                                model.fontStyle =
+                                        (textShow.font.bold?"bold,":"" )
+                                        + ( textShow.font.italic?"italic.":"")
+                                        + ( textShow.font.underline?"underline,":"");
+                            }
+                        }
+                        Action { text: "下划线"
+                            onTriggered: {
+                                textShow.font.underline = !textShow.font.underline;
+                                model.fontStyle =
+                                        (textShow.font.bold?"bold,":"" )
+                                        + ( textShow.font.italic?"italic.":"")
+                                        + ( textShow.font.underline?"underline,":"");
+                            }
+                        }
+
+                        Action { text: "字体颜色..."
+                            onTriggered: {
+                                colorDialog.open();
+                            }
+                        }
                   }
 
             }
@@ -199,6 +249,8 @@ Rectangle {
                         
                         //控制可见: 不是当前
                         visible: !mouseArea.ListView.isCurrentItem
+                        color: model.textColor
+                        font.bold: model.fontStyle.includes("bold")
                         
                         //底部留点空间
                         bottomPadding: 3
@@ -235,8 +287,10 @@ Rectangle {
                         }
                         
                         onEditingFinished: {
-                            console.debug("=== start onEditingFinished ")
+                            //console.debug("=== start onEditingFinished ")
+
                             model.desc = textinput.text
+                            model.updated = new Date(); //也可以在ListModel中设置, 更合理
                             
                             //方法1: 设置index
                             if (listView.currentIndex == index) {
@@ -247,12 +301,14 @@ Rectangle {
                                 mouseArea.acceptedButtons = Qt.LeftButton | Qt.RightButton;
                             }
                             
+                            /*
                             console.log(("TextInput listview currentIndex: "
                                          + listView.currentIndex + " index: " + index))
                             console.log(("TextInput ListView isCurrentItem: "
                                          + mouseArea.ListView.isCurrentItem))
                             
                             console.debug("=== end onEditingFinished ")
+                            */
                         }
                     } //end TextInput
                     
@@ -280,16 +336,16 @@ Rectangle {
                     console.debug("===== start DropArea onEntered")
                     console.debug("drag.source.DelegateModel.itemsIndex: " + drag.source.DelegateModel.itemsIndex)
                     console.debug("mouseArea.DelegateModel.itemsIndex: " + mouseArea.DelegateModel.itemsIndex )
+                    var srcIndex = drag.source.DelegateModel.itemsIndex;
+                    var destIndex = mouseArea.DelegateModel.itemsIndex;
                     
                     //移动Delegate
-                    visualModel.items.move(
-                                drag.source.DelegateModel.itemsIndex,
-                                mouseArea.DelegateModel.itemsIndex, 1)
+                    visualModel.items.move(srcIndex, destIndex, 1)
                     
                     //移动Model: 不移动的话model和delegate就不同步了
-                    visualModel.model.move(
-                                drag.source.DelegateModel.itemsIndex,
-                                mouseArea.DelegateModel.itemsIndex, 1)
+
+                    visualModel.model.moveRow(srcIndex, destIndex)
+
                     
                     console.debug("===== end DropArea onEntered")
                 }

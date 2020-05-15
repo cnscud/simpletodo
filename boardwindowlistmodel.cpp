@@ -65,6 +65,9 @@ bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &val
 
         if(data(index, role) != value) {
 
+          //总是更新为最新时间
+          board->setUpdated(QDateTime::currentDateTime());
+
                 // set value
                 switch(role) {
                         case BidRole:
@@ -107,8 +110,10 @@ bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &val
 
 
                 //debug
-                qDebug("[BoardWindowListModel]Data changed %d  value %ls", role, qUtf16Printable(value.toString()));
-                //qDebug() << value;
+                QHash<int, QByteArray> names = roleNames();
+                QString roleName = QString::fromUtf8(names[role]);
+
+                qDebug("[BoardWindowListModel]Data changed %s  value %s", qUtf8Printable(roleName), qUtf8Printable(value.toString()));
 
                 emit dataChanged(index, index, QVector<int>() << role);
                 return true;
