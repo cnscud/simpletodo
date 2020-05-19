@@ -25,7 +25,8 @@ Rectangle {
     property ListView pListView
     property StrikeListModel listModel
 
-    property string title : "Hello Board";
+    property string title : "Hello Board"
+    property bool titleEditMode: false
 
 
 
@@ -46,7 +47,7 @@ Rectangle {
             
             //isMoveWindow = false
         }
-        
+
         onPositionChanged: {
             var delta = Qt.point(mouse.x - clickPos.x, mouse.y - clickPos.y)
             
@@ -58,6 +59,14 @@ Rectangle {
             model.windowX = window.x;
             model.windowY = window.y;
         }
+
+        onDoubleClicked: {
+            //进入编辑状态
+            titleEditMode = true;
+            //设置焦点
+            titleTextinput.focus = true;
+        }
+
     }
     
     Button {
@@ -70,6 +79,10 @@ Rectangle {
 
         anchors.left: parent.left
         anchors.leftMargin: 0
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 0
+
+
         //opacity: 0.5
         flat: true
         font.bold: true
@@ -82,16 +95,67 @@ Rectangle {
         }
     }
     
-    //Todo 标题可编辑修改
-    Label {
-        id: boardTitleLbl
-        text: title
+
+    Rectangle {
+        id: titleTextSection
+        height: parent.height
+
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 5
 
         anchors.left: closeButton.right
         anchors.leftMargin: 20
-    }
+        anchors.right: newStrikeButton.left
+        anchors.rightMargin: 10
+
+        color: titleOpRect.color
+
+
+        Text {
+            id: titleText
+
+            text: title
+            anchors.bottom: parent.bottom
+
+            //控制可见: 是否编辑状态
+            visible: !titleEditMode
+
+            //底部留点空间
+            bottomPadding: 5
+
+        } //end titleText
+
+        TextInput {
+            id: titleTextinput
+
+            anchors.bottom: parent.bottom
+
+            color: "blue"
+            font.bold: true
+
+            //底部留点空间
+            bottomPadding: 5
+
+            text: title
+
+            visible: titleEditMode
+
+            //focus: true
+            selectByMouse: true
+
+
+            onEditingFinished: {
+
+                model.title = titleTextinput.text
+                model.updated = new Date();
+
+                //恢复正常显示
+                titleEditMode = false;
+
+            }
+        } //end titleTextinput
+
+    } //end titleTextSection Rectangle
+
     
     Button {
         id: newStrikeButton
@@ -99,9 +163,12 @@ Rectangle {
         width: 25
         height: parent.height
         text: "+"
+
         anchors.right: parent.right
         anchors.rightMargin: 0
-        
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 0
+
         flat: true
         //font.bold: true
         font.pointSize: 22

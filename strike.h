@@ -16,8 +16,7 @@ public:
   {
     NewAdd = 0,
     Working = 1,
-    Done =2,
-    Archived =99
+    Done =2
   };
 
 

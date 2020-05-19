@@ -137,10 +137,27 @@ Rectangle {
                   CoodMenu {
                         title: "标记状态为"
 
-                        Action { text: "未开始" }
-                        Action { text: "进行中" }
-                        Action { text: "已完成" }
-                        Action { text: "已归档" }
+                        Action { text: "未开始"
+                            onTriggered: {
+                                model.status = 0;
+                            }
+                        }
+                        Action { text: "进行中"
+                            onTriggered: {
+                                model.status = 1;
+                            }
+                        }
+                        Action { text: "已完成"
+                            onTriggered: {
+                                model.status = 2;
+                            }
+                        }
+                        Action { text: "已归档"
+                            onTriggered: {
+                                //Todo 归档就是打个标记: 但是如何隐藏哪
+
+                            }
+                        }
                   }
 
                   MenuSeparator { }
@@ -224,14 +241,18 @@ Rectangle {
                 
                 CheckBox {
                     id: chkbox
+                    tristate: true
                     width: 50
                     //height: parent.height
                     anchors.bottom: parent.bottom
                     //底部留点空间
                     bottomPadding: 3
+                    checkState: model.status ===2? Qt.Checked: ( model.status ===1?Qt.PartiallyChecked: Qt.Unchecked );
                     
-                    checked: model.status === 2
-                    onClicked: { model.status = 2 }
+                    //checked: model.status === 2
+                    onClicked: {
+                        model.status === 2? model.status = 0: ( model.status ===1? model.status=2: model.status = 1);
+                    }
                 }
                 
                 Rectangle {
