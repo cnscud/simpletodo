@@ -1,6 +1,7 @@
 #ifndef STRIKEMODEL_H
 #define STRIKEMODEL_H
 
+#include "board.h"
 #include "strike.h"
 
 #include <QAbstractListModel>
@@ -53,7 +54,13 @@ class StrikeListModel : public QAbstractListModel
   QList<Strike*> strikes() const;
   void setStrikes(const QList<Strike*> &strikes);
 
+
+
+  Board *getBoard() const;
+  void setBoard(Board *value);
+
 private:
+  Board* board; //父节点
   QList<Strike*> m_strikes;
 
 };

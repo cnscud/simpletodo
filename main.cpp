@@ -1,6 +1,7 @@
 #include "board.h"
 #include "strikelistmodel.h"
 #include "boardwindowlistmodel.h"
+#include "datamanager.h"
 
 #include <QApplication>
 #include <QGuiApplication>
@@ -16,8 +17,18 @@ int main(int argc, char *argv[])
   //所有窗口关闭程序也不退出 Todo 最后打开 而且应该提示用户
   //QApplication::setQuitOnLastWindowClosed(false);
 
+
+  DataManager dataMan;
+
   //start data ============================================
   //手工模拟数据
+  Board* board1 = new Board();
+  board1->setBid("b1111");
+  board1->setTitle("Board Todo 1111");
+
+  Board* board2 = new Board();
+  board2->setBid("b222");
+  board2->setTitle("Board Todo 2222");
 
 
   Strike strike11;
@@ -33,6 +44,7 @@ int main(int argc, char *argv[])
 
   StrikeListModel* strikeListModel1 = new StrikeListModel();
   strikeListModel1->setStrikes(strikeList1);
+  strikeListModel1->setBoard(board1);
 
 
   Strike strike21;
@@ -48,15 +60,8 @@ int main(int argc, char *argv[])
 
   StrikeListModel* strikeListModel2 = new StrikeListModel();
   strikeListModel2->setStrikes(strikeList2);
+  strikeListModel2->setBoard(board2);
 
-
-  Board* board1 = new Board();
-  board1->setBid("b1111");
-  board1->setTitle("Board Todo 1111");
-
-  Board* board2 = new Board();
-  board2->setBid("b222");
-  board2->setTitle("Board Todo 2222");
 
 
   BoardModelProxy bmp1;
@@ -80,6 +85,7 @@ int main(int argc, char *argv[])
   qmlRegisterType<StrikeListModel>("StrikeTodo", 1, 0, "StrikeListModel");
 
 
+  //set model
   engine.rootContext()->setContextProperty("windowModel", &bwlm);
 
 
@@ -91,8 +97,24 @@ int main(int argc, char *argv[])
           QCoreApplication::exit(-1);
       }, Qt::QueuedConnection);
 
-  //Todo 监听数据变化, 实时保存 : Board, StrikeList 等等
-  //QObject::connect(&model, &ToDoModel::dataChanged, &dataMan, &DataManager::saveData);
+
+  //监听窗口数据变化, 实时保存
+  QObject::connect(&bwlm, &BoardWindowListModel::dataChanged, &dataMan, &DataManager::windowModelDataChanged);
+  QObject::connect(&bwlm, &BoardWindowListModel::rowsInserted, &dataMan, &DataManager::windowModelRowsInserted);
+  QObject::connect(&bwlm, &BoardWindowListModel::rowsMoved, &dataMan, &DataManager::windowModelRowsMoved);
+  QObject::connect(&bwlm, &BoardWindowListModel::rowsRemoved, &dataMan, &DataManager::windowModelRowsRemoved);
+
+  //每个白板的任务列表都要监测: 方便保存数据
+  for(int i=0; i< boardProxyList.size();++i){
+    BoardModelProxy* proxy = boardProxyList.at(i);
+    StrikeListModel* slm = proxy->strikeListModel();
+
+    //绑定事件: 但是不知道是哪个StrikeList! 自定义信号可以解决, 目前应该不需要
+    QObject::connect(slm, &StrikeListModel::dataChanged, &dataMan, &DataManager::strikeModelDataChanged);
+    QObject::connect(slm, &StrikeListModel::rowsInserted, &dataMan, &DataManager::strikeModelRowsInserted);
+    QObject::connect(slm, &StrikeListModel::rowsMoved, &dataMan, &DataManager::strikeModelRowsMoved);
+    QObject::connect(slm, &StrikeListModel::rowsRemoved, &dataMan, &DataManager::strikeModelRowsRemoved);
+  }
 
 
 

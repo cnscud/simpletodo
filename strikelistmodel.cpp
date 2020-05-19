@@ -189,7 +189,16 @@ void StrikeListModel::setStrikes(const QList<Strike*> &strikes) {
 
         m_strikes = strikes;
 
-
         endResetModel();
 
+}
+
+Board *StrikeListModel::getBoard() const
+{
+  return board;
+}
+
+void StrikeListModel::setBoard(Board *value)
+{
+  board = value;
 }
