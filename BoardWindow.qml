@@ -27,6 +27,7 @@ Window {
         pListView: itemRoot.pListView
         title: model.title
         listModel: model.strikeListModel
+        backColor: model.backColor
     }
 
 
@@ -38,6 +39,8 @@ Window {
         width: parent.width
         height: parent.height - titleOpRect.height - footOpRect.height
         listModel: model.strikeListModel
+        backColor: model.backColor
+        fontSize: model.fontSize
     }
 
 
@@ -46,6 +49,7 @@ Window {
     FootOpSection {
         id: footOpRect
         pListView: itemRoot.pListView
+        backColor: model.backColor
     }
 
 }

@@ -58,11 +58,18 @@ class Board: public QObject {
   QString getTitle() const;
   void setTitle(const QString &value);
 
+  int getFontSize() const;
+  void setFontSize(int value);
+
+
+
 private:
   QString bid; //唯一key: UUID ?
   QString title; //白板名称
   bool hidden = false; //是否隐藏
-  QString backColor = "#000000"; //背景色
+  QString backColor = "#DAE362"; //背景色
+  int fontSize = 24; //字体大小
+
   bool hiddenArchived = false; //是否隐藏归档的任务
 
   QDateTime created = QDateTime::fromString("2000-01-01 12:00:00"); //创建时间

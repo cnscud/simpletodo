@@ -16,17 +16,24 @@ Rectangle {
 
     //父窗口的ListView
     property ListView pListView
+    property string backColor: "#f5e50a"
+
+    color: backColor
 
     Label {
         id: totalLbl
-        //text:  "Total "+ listView.model.model.rowCount() +" Strikes"
-        text: "Total " + pListView.count + " Strikes"
         anchors.left: parent.left
-        anchors.leftMargin: 20
+        anchors.leftMargin: 10
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 5
+
+        text: "Total " + pListView.count + " Tasks"
+
     }
 
     Button {
         text: qsTr("New Board --- Todo ")
+        height: parent.height
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.bottom: parent.bottom

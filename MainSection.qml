@@ -12,11 +12,13 @@ Rectangle {
 
     property alias pListView: listView
     property StrikeListModel listModel
+    property string backColor: "#f5e50a"
+    property int fontSize: 14
 
     
     //调试显示
-    //color: "blue"
-    //border.width: 2
+    color: backColor
+    //opacity: 0.75
     
     Component {
         id: delegateItem
@@ -206,9 +208,16 @@ Rectangle {
             //实际显示内容
             Rectangle {
                 id: itemRect
-                height: 40
+
+                //Todo: 如何根据文字大小自动适应高度
+                //height: 40
+                height: textShow.height + 5
+
                 width: mouseArea.width
-                
+
+                color: backColor
+                //opacity: 0.75
+
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     verticalCenter: parent.verticalCenter
@@ -257,21 +266,26 @@ Rectangle {
                 
                 Rectangle {
                     id: textSection
-                    height: parent.height
+                    //height: parent.height
+                    height: textShow.height + 5
                     
                     width: parent.width - chkbox.width
                     anchors.left: chkbox.right
+                    color: backColor
+                    //opacity: 0.0
                     
                     Text {
                         id: textShow
-                        
-                        text: model.desc
                         anchors.bottom: parent.bottom
+
+                        text: model.desc
                         
                         //控制可见: 不是当前
                         visible: !mouseArea.ListView.isCurrentItem
                         color: model.textColor
                         font.bold: model.fontStyle.includes("bold")
+                        //字体大小
+                        font.pixelSize: fontSize
                         
                         //底部留点空间
                         bottomPadding: 3
@@ -390,6 +404,8 @@ Rectangle {
         
         width: parent.width
         height: parent.height
+
+        //opacity: 0.9
         
         keyNavigationEnabled: true
         

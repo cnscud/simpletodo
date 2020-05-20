@@ -48,8 +48,10 @@ QVariant BoardWindowListModel::data(const QModelIndex &index, int role) const {
                         return board->getWindowWidth();
                 case WindowHeightRole:
                         return board->getWindowHeight();
+                case FontSizeRole:
+                    return board->getFontSize();
 
-                //Todo get ListModel for listview
+                //get ListModel for listview
                 case StrikeListModelRole:
                        return QVariant::fromValue(boardProxy->strikeListModel());
         }
@@ -105,6 +107,9 @@ bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &val
                         case WindowHeightRole:
                                 board->setWindowHeight(value.toInt());
                                 break;
+                        case FontSizeRole:
+                          board->setFontSize(value.toInt());
+                          break;
 
                 }
 
@@ -143,6 +148,7 @@ QHash<int, QByteArray> BoardWindowListModel::roleNames() const {
         names[WindowYRole] = "windowY";
         names[WindowWidthRole] = "windowWidth";
         names[WindowHeightRole] = "windowHeight";
+        names[FontSizeRole] = "fontSize";
         names[StrikeListModelRole] = "strikeListModel";
 
         return names;

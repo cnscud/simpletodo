@@ -18,17 +18,18 @@ Rectangle {
     y: 0
     width: parent.width
     height: 30
-    color: "#f5e50a"
-    //opacity: 0.766
 
     //父窗口的ListView
     property ListView pListView
     property StrikeListModel listModel
+    property string backColor: "#f5e50a"
 
     property string title : "Hello Board"
     property bool titleEditMode: false
 
 
+    color: backColor
+    opacity: 0.9
 
     MouseArea {
         id: mouseMoveWindowArea
@@ -76,7 +77,6 @@ Rectangle {
         height: parent.height
         text: "X"
 
-
         anchors.left: parent.left
         anchors.leftMargin: 0
         anchors.bottom: parent.bottom
@@ -99,15 +99,19 @@ Rectangle {
     Rectangle {
         id: titleTextSection
         height: parent.height
+        //color: "#f5e50a"
+        visible: true
+        opacity: 1
 
         anchors.bottom: parent.bottom
 
         anchors.left: closeButton.right
-        anchors.leftMargin: 20
+        anchors.leftMargin: 0
         anchors.right: newStrikeButton.left
-        anchors.rightMargin: 10
+        anchors.rightMargin: 0
 
-        color: titleOpRect.color
+        color: backColor
+
 
 
         Text {
@@ -191,6 +195,21 @@ Rectangle {
             
         }
     }
+
+    Frame {
+        width: titleOpRect.width
+        height: 1
+        anchors.bottom: titleOpRect.bottom
+        Rectangle {
+            height: parent.height
+            width: parent.width
+            color: "blue"
+        }
+
+        //anchors.topMargin: 1
+
+    }
+
     
     
     MessageDialog {

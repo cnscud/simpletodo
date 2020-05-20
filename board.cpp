@@ -137,8 +137,18 @@ void Board::setTitle(const QString &value)
     title = value;
 }
 
+int Board::getFontSize() const
+{
+  return fontSize;
+}
+
+void Board::setFontSize(int value)
+{
+  fontSize = value;
+}
+
 QDateTime Board::getCreated() const {
-    return created;
+  return created;
 }
 
 void Board::setCreated(const QDateTime &value) {
