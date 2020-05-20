@@ -15,6 +15,7 @@ class BoardWindowListModel : public QAbstractListModel
   explicit BoardWindowListModel(QObject *parent = nullptr);
 
 
+  //不要留空行: 有时候莫名其妙出错
   enum {
     BidRole,
     TitleRole,
@@ -28,8 +29,7 @@ class BoardWindowListModel : public QAbstractListModel
     WindowWidthRole,
     WindowHeightRole,
     FontSizeRole,
-    StrikeListModelRole //特殊, 是ListModel类型的, 不是普通QList
-
+    StrikeListModelRole, //特殊, 是ListModel类型的, 不是普通QList
   };
 
 

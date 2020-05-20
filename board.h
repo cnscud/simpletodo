@@ -63,12 +63,15 @@ class Board: public QObject {
 
 
 
+  QList<Strike *> getItems() const;
+  void setItems(const QList<Strike *> &items);
+
 private:
   QString bid; //唯一key: UUID ?
   QString title; //白板名称
   bool hidden = false; //是否隐藏
   QString backColor = "#DAE362"; //背景色
-  int fontSize = 24; //字体大小
+  int fontSize = 18; //字体大小
 
   bool hiddenArchived = false; //是否隐藏归档的任务
 

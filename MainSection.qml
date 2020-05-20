@@ -298,6 +298,7 @@ Rectangle {
                         anchors.bottom: parent.bottom
                         
                         color: "blue"
+                        font.pixelSize: fontSize
                         
                         //底部留点空间
                         bottomPadding: 3

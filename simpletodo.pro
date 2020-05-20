@@ -21,6 +21,7 @@ SOURCES += \
         datamanager.cpp \
         helputils.cpp \
         main.cpp \
+        mockhelper.cpp \
         strike.cpp \
         strikelistmodel.cpp
 
@@ -38,7 +39,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    README.md
+    README.md \
+    template.json
 
 HEADERS += \
     board.h \
@@ -47,5 +49,6 @@ HEADERS += \
     consts.h \
     datamanager.h \
     helputils.h \
+    mockhelper.h \
     strike.h \
     strikelistmodel.h

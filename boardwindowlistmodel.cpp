@@ -34,12 +34,10 @@ QVariant BoardWindowListModel::data(const QModelIndex &index, int role) const {
                         return board->getBackColor();
                 case HiddenArchivedRole:
                         return board->getHiddenArchived();
-
                 case CreatedRole:
                         return board->getCreated();
                 case UpdatedRole:
                         return board->getUpdated();
-
                 case WindowXRole:
                         return board->getWindowX();
                 case WindowYRole:
@@ -49,8 +47,7 @@ QVariant BoardWindowListModel::data(const QModelIndex &index, int role) const {
                 case WindowHeightRole:
                         return board->getWindowHeight();
                 case FontSizeRole:
-                    return board->getFontSize();
-
+                        return board->getFontSize();
                 //get ListModel for listview
                 case StrikeListModelRole:
                        return QVariant::fromValue(boardProxy->strikeListModel());
@@ -62,10 +59,11 @@ QVariant BoardWindowListModel::data(const QModelIndex &index, int role) const {
 
 bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
 
-        BoardModelProxy* boardProxy = m_boardModelProxys.at(index.row());
-        Board* board = boardProxy->board();;
 
         if(data(index, role) != value) {
+
+          BoardModelProxy* boardProxy = m_boardModelProxys.at(index.row());
+          Board* board = boardProxy->board();;
 
           //总是更新为最新时间
           board->setUpdated(QDateTime::currentDateTime());
@@ -108,9 +106,8 @@ bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &val
                                 board->setWindowHeight(value.toInt());
                                 break;
                         case FontSizeRole:
-                          board->setFontSize(value.toInt());
-                          break;
-
+                              board->setFontSize(value.toInt());
+                              break;
                 }
 
 
@@ -149,6 +146,7 @@ QHash<int, QByteArray> BoardWindowListModel::roleNames() const {
         names[WindowWidthRole] = "windowWidth";
         names[WindowHeightRole] = "windowHeight";
         names[FontSizeRole] = "fontSize";
+
         names[StrikeListModelRole] = "strikeListModel";
 
         return names;

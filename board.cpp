@@ -147,12 +147,22 @@ void Board::setFontSize(int value)
   fontSize = value;
 }
 
+QList<Strike *> Board::getItems() const
+{
+  return mItems;
+}
+
+void Board::setItems(const QList<Strike *> &items)
+{
+  mItems = items;
+}
+
 QDateTime Board::getCreated() const {
   return created;
 }
 
 void Board::setCreated(const QDateTime &value) {
-        created = value;
+  created = value;
 }
 
 QDateTime Board::getUpdated() const {

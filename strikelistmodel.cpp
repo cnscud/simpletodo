@@ -109,6 +109,11 @@ bool StrikeListModel::insertRows(int row, int count, const QModelIndex &parent) 
 
         for(int i = 0; i < count; ++i) {
                 Strike* strike = new Strike();
+                strike->setSid(HelpUtils::uuid());
+                strike->setDesc("New Task" + QString::number(m_strikes.size() + 1));
+                strike->setStatus(Strike::NewAdd);
+                strike->setCreated(QDateTime::currentDateTime());
+                strike->setUpdated(QDateTime::currentDateTime());
 
                 m_strikes.insert(row, strike);
         }
@@ -163,12 +168,15 @@ bool StrikeListModel::moveRow(int sourceRow, int destRow) {
 bool StrikeListModel::addStrike() {
         insertRows(0, 1, QModelIndex());
 
+        //监听了rowsInserted事件, 所以不单独setData了
+        /*
         QModelIndex qi = index(0, 0);
         setData(qi, HelpUtils::uuid(), SidRole);
         setData(qi, "New Task" + QString::number(m_strikes.size() + 1), DescRole);
         setData(qi, Strike::NewAdd, StatusRole);
         setData(qi, QDateTime::currentDateTime(), CreatedRole);
         setData(qi, QDateTime::currentDateTime(), UpdatedRole);
+        */
 
         return true;
 }

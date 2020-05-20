@@ -5,7 +5,6 @@ BoardModelProxy::BoardModelProxy()
 
 }
 
-
 Board *BoardModelProxy::board() const
 {
   return m_board;
@@ -25,3 +24,5 @@ void BoardModelProxy::setStrikeListModel(StrikeListModel *strikeListModel)
 {
   m_strikeListModel = strikeListModel;
 }
+
+

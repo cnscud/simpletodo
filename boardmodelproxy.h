@@ -13,14 +13,15 @@ class BoardModelProxy: public QObject
  public:
   BoardModelProxy();
 
+
+ //Q_SIGNALS:
+ // void strikeListModelChanged();
+
   Board *board() const;
   void setBoard(Board *board);
 
   StrikeListModel *strikeListModel() const;
   void setStrikeListModel(StrikeListModel *strikeListModel);
-
- Q_SIGNALS:
-  void strikeListModelChanged();
 
 private:
 
