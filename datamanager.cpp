@@ -4,6 +4,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSaveFile>
 #include <QStandardPaths>
 
 DataManager::DataManager() {
@@ -15,7 +16,8 @@ void DataManager::windowModelDataChanged(const QModelIndex &topLeft, const QMode
 
         qDebug("[windowModelDataChanged] row %d to row %d", topLeft.row(), bottomRight.row());
 
-        //Todo Save Model Data
+        //Save Model Data
+        fireSaveData();
 
 }
 
@@ -23,6 +25,7 @@ void DataManager::windowModelRowsInserted(const QModelIndex &parent, int first, 
         Q_UNUSED(parent);
         qDebug("[windowModelRowsInserted] first %d to last %d", first, last);
 
+        fireSaveData();
 }
 
 void DataManager::windowModelRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row) {
@@ -31,6 +34,7 @@ void DataManager::windowModelRowsMoved(const QModelIndex &parent, int start, int
 
         qDebug("[windowModelRowsMoved] start %d to end %d, to row %d", start, end, row);
 
+        fireSaveData();
 }
 
 void DataManager::windowModelRowsRemoved(const QModelIndex &parent, int first, int last) {
@@ -38,18 +42,21 @@ void DataManager::windowModelRowsRemoved(const QModelIndex &parent, int first, i
 
         qDebug("[windowModelRowsRemoved] first %d to last %d", first, last);
 
+        fireSaveData();
 }
 
 void DataManager::strikeModelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
         Q_UNUSED(roles);
         qDebug("[strikeModelDataChanged] datachanged row %d to row %d", topLeft.row(), bottomRight.row());
 
+        fireSaveData();
 }
 
 void DataManager::strikeModelRowsInserted(const QModelIndex &parent, int first, int last) {
         Q_UNUSED(parent);
         qDebug("[strikeModelRowsInserted] first %d to last %d", first, last);
 
+        fireSaveData();
 }
 
 void DataManager::strikeModelRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row) {
@@ -58,6 +65,7 @@ void DataManager::strikeModelRowsMoved(const QModelIndex &parent, int start, int
 
         qDebug("[strikeModelRowsMoved] start %d to end %d, to row %d", start, end, row);
 
+        fireSaveData();
 }
 
 void DataManager::strikeModelRowsRemoved(const QModelIndex &parent, int first, int last) {
@@ -65,13 +73,14 @@ void DataManager::strikeModelRowsRemoved(const QModelIndex &parent, int first, i
 
         qDebug("[strikeModelRowsRemoved] first %d to last %d", first, last);
 
+        fireSaveData();
 }
 
 
 
 
 
-QList<Board*> DataManager::readAllBoards() {
+QList<Board*>* DataManager::readAllBoards() {
         QJsonDocument doc = readDataFromFile();
 
         //parse json
@@ -80,7 +89,7 @@ QList<Board*> DataManager::readAllBoards() {
         if(json.contains("all") && json["all"].isArray()) {
                 QJsonArray allArray = json["all"].toArray();
 
-                QList<Board*> todoLists;
+                QList<Board*> *todoLists = new QList<Board*>();
 
                 for(int n = 0; n < allArray.size(); ++n) {
                         QString listName = allArray[n].toString();
@@ -88,21 +97,20 @@ QList<Board*> DataManager::readAllBoards() {
                         //读一个任务列表
                         Board* oneList = parseOneBoard(json, listName);
 
-                        todoLists.append(oneList);
+                        todoLists->append(oneList);
                 }
 
                 mBoards = todoLists; //
                 return todoLists;
         }
 
-        return QList<Board*>();
+        return new QList<Board*>();
 }
 
 
 Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr) {
         // read one board from json
         Board* board = new Board();
-        //todoBoard->setAbbr(abbr);
 
         if(!json.contains(abbr)) {
                 return board;
@@ -112,10 +120,11 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr) {
 
         QJsonObject oneSection = json[abbr].toObject();
 
+        board->setBid(oneSection["bid"].toString());
+
         QString title = oneSection["title"].toString();
         board->setTitle(title);
 
-        board->setBid(oneSection["bid"].toString());
         board->setHidden(oneSection["hidden"].toBool());
 
         if(oneSection.contains("backColor") ) {
@@ -141,7 +150,7 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr) {
 
                 QJsonArray itemArray = oneSection["items"].toArray();
 
-                QList<Strike*> items;
+                QList<Strike*> *items = new QList<Strike*>();
 
                 for(int n = 0; n < itemArray.size(); ++n) {
                         QJsonObject item = itemArray[n].toObject();
@@ -159,7 +168,7 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr) {
                         strike->setUpdated(QDateTime::fromString(item["updated"].toString()));
 
 
-                        items.append(strike);
+                        items->append(strike);
                 }
 
                 board->setItems(items);
@@ -216,53 +225,89 @@ QJsonDocument DataManager::readDataFromFile() {
 
 
 
+void DataManager::fireSaveData(){
+  qDebug("fired save data ============= start");
 
-/*
-void DataManager::saveData(const QModelIndex topLeft, const QModelIndex bottomRight) {
+  //really save
+  doSaveData();
+
+  qDebug("fired save data ============= end  ");
+}
+
+
+//只负责存储数据, 不处理并发
+void DataManager::doSaveData() {
   //save data
-  qDebug("hello save data");
+  qDebug("hello start to save data......");
 
-QJsonObject saveObject;
+  QJsonObject saveObject;
 
-QJsonArray allArray;
-for(int n = 0; n < mBoards.size(); ++n) {
-  ToDoBoard* board = mBoards.at(n);
+  QJsonArray allArray;
+  for(int n = 0; n < mBoards->size(); ++n) {
+    Board* board = mBoards->at(n);
 
-  allArray.append(board->getAbbr());
+    allArray.append(board->getBid());
 
-  QJsonObject boardObj;
+    QJsonObject boardObj;
+    boardObj["bid"] = board->getBid();
+    boardObj["title"] = board->getTitle();
+    boardObj["hidden"] = board->getHidden();
+    boardObj["backColor"] = board->getBackColor();
+    boardObj["fontSize"] = board->getFontSize();
+    boardObj["hiddenArchived"] = board->getHiddenArchived();
+    boardObj["windowX"] = board->getWindowX();
+    boardObj["windowY"] = board->getWindowY();
+    boardObj["windowWidth"] = board->getWindowWidth();
+    boardObj["windowHeight"] = board->getWindowHeight();
 
-  QJsonArray boardItemsArray;
-  QList<ToDoItem> items = board->items();
-  for(int m = 0; m < items.count(); ++m) {
-    ToDoItem item = items.at(m);
-    QJsonObject itemObj;
-    itemObj["name"] = item.description;
-    itemObj["done"] = item.done ? "1" : "0";
+    boardObj["created"] = board->getCreated().toString("yyyy-MM-dd hh:mm:ss");
+    boardObj["updated"] = board->getUpdated().toString("yyyy-MM-dd hh:mm:ss");
 
-    boardItemsArray.append(itemObj);
+
+    QJsonArray boardItemsArray;
+    QList<Strike*> *items = board->getItems();
+
+    for(int m = 0; m < items->count(); ++m) {
+      Strike* item = items->at(m);
+      QJsonObject itemObj;
+      itemObj["sid"] = item->getSid();
+      itemObj["desc"] = item->getDesc();
+      itemObj["status"] = item->getStatus();
+      itemObj["textColor"] = item->getTextColor();
+      itemObj["fontStyle"] = item->getFontStyle();
+
+      itemObj["created"] = item->getCreated().toString("yyyy-MM-dd hh:mm:ss");
+      itemObj["updated"] = item->getUpdated().toString("yyyy-MM-dd hh:mm:ss");
+
+      boardItemsArray.append(itemObj);
+    }
+
+    boardObj["items"] = boardItemsArray;
+
+    saveObject[board->getBid()] = boardObj;
   }
 
-  boardObj["name"] = board->getName();
-  boardObj["list"] = boardItemsArray;
+  saveObject["all"] = allArray;
 
 
-  saveObject[board->getAbbr()] = boardObj;
+  QString pathName = pickDataFilePathName();
+
+
+
+  QSaveFile file(pathName);
+  if(!file.open(QIODevice::WriteOnly)) {
+    qWarning("Couldn't open save file %s", qPrintable(pathName));
+    return;
+  }
+
+  QJsonDocument saveDoc(saveObject);
+  file.write(saveDoc.toJson());
+
+  //真正保存到实际文件
+  file.commit();
+
+  qDebug("hello end to save data......");
+
 }
 
-saveObject["all"] = allArray;
-
-
-QString pathName = pickDataFilePathName();
-QFile saveFile(pathName);
-
-if(!saveFile.open(QIODevice::WriteOnly)) {
-  qWarning("Couldn't open save file.");
-  return;
-}
-
-QJsonDocument saveDoc(saveObject);
-saveFile.write(saveDoc.toJson());
-}
-*/
 

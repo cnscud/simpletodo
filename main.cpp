@@ -29,18 +29,17 @@ int main(int argc, char *argv[])
   //BoardWindowListModel* bwlm = mock->mockData();
 
   //从文件读取
-  QList<Board*> boards = dataMan.readAllBoards();
+  QList<Board*> *boards = dataMan.readAllBoards();
 
 
   QList<BoardModelProxy*> boardProxyList;
-  for(int i=0;i<boards.size();++i){
-    Board* board = boards.at(i);
+  for(int i=0;i<boards->size();++i){
+    Board* board = boards->at(i);
     BoardModelProxy* bmproxy = new BoardModelProxy();
     bmproxy->setBoard(board);
 
     StrikeListModel* strikeListModel = new StrikeListModel();
     strikeListModel->setBoard(board);
-    strikeListModel->setStrikes(board->getItems());
 
     bmproxy->setStrikeListModel(strikeListModel);
 

@@ -12,6 +12,7 @@ class DataManager : public QObject
 {
  public:
   DataManager();
+  const QString dataFileName = "simpletodo.json"; //文件名
 
 
   //白板列表模型数据变化
@@ -31,16 +32,16 @@ class DataManager : public QObject
 
 
   //读取所有数据
-  QList<Board*> readAllBoards();
+  QList<Board*> *readAllBoards();
 
 
   //保存数据
-  //void saveData();
+  void doSaveData();
+  void fireSaveData();
 
 
  private:
-  const QString dataFileName = "simpletodo.json"; //文件名
-  QList<Board*> mBoards;
+  QList<Board*> *mBoards;
 
   QString pickDataFilePathName();
   QJsonDocument readDataFromFile();

@@ -35,7 +35,6 @@ BoardWindowListModel* MockHelper::mockData()
   strikeList1 << &strike11 << &strike12;
 
   StrikeListModel* strikeListModel1 = new StrikeListModel();
-  strikeListModel1->setStrikes(strikeList1);
   strikeListModel1->setBoard(board1);
 
 
@@ -51,7 +50,6 @@ BoardWindowListModel* MockHelper::mockData()
   strikeList2 << &strike21 << &strike22;
 
   StrikeListModel* strikeListModel2 = new StrikeListModel();
-  strikeListModel2->setStrikes(strikeList2);
   strikeListModel2->setBoard(board2);
 
 

@@ -52,11 +52,11 @@ private:
   QString desc; //任务名称
   int status; //任务状态
 
-  QString textColor; //文字颜色
+  QString textColor = "black"; //文字颜色
   QString fontStyle; //文字特色
 
-  QDateTime created = QDateTime::fromString("2000-01-01 12:00:00"); //创建时间
-  QDateTime updated = QDateTime::fromString("2000-01-01 12:00:00"); //更新时间
+  QDateTime created = QDateTime::fromString("2000-01-01 12:00:00", "yyyy-MM-dd hh:mm:ss"); //创建时间
+  QDateTime updated = QDateTime::fromString("2000-01-01 12:00:00", "yyyy-MM-dd hh:mm:ss"); //更新时间
 
 
 };

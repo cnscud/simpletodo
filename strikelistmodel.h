@@ -51,8 +51,8 @@ class StrikeListModel : public QAbstractListModel
   Q_INVOKABLE bool removeStrike(int index);
 
 
-  QList<Strike*> strikes() const;
-  void setStrikes(const QList<Strike*> &strikes);
+  //QList<Strike*> strikes() const;
+  //void setStrikes(const QList<Strike*> &strikes);
 
 
 
@@ -61,7 +61,7 @@ class StrikeListModel : public QAbstractListModel
 
 private:
   Board* board; //父节点
-  QList<Strike*> m_strikes;
+  //QList<Strike*> m_strikes;
 
 };
 

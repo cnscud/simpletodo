@@ -9,14 +9,14 @@ int StrikeListModel::rowCount(const QModelIndex &parent) const {
         if(parent.isValid())
                 return 0;
 
-        return m_strikes.size();
+        return board->getItems()->size();
 }
 
 QVariant StrikeListModel::data(const QModelIndex &index, int role) const {
         if(!index.isValid())
                 return QVariant();
 
-        Strike* strike = m_strikes.at(index.row());
+        Strike* strike = board->getItems()->at(index.row());
 
         switch(role) {
                 case SidRole:
@@ -41,7 +41,7 @@ QVariant StrikeListModel::data(const QModelIndex &index, int role) const {
 bool StrikeListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
 
         if(data(index, role) != value) {
-                Strike* strike = m_strikes.at(index.row());
+          Strike* strike = board->getItems()->at(index.row());
 
                 //总是更新最新更新时间
                 strike->setUpdated(QDateTime::currentDateTime());
@@ -110,12 +110,12 @@ bool StrikeListModel::insertRows(int row, int count, const QModelIndex &parent) 
         for(int i = 0; i < count; ++i) {
                 Strike* strike = new Strike();
                 strike->setSid(HelpUtils::uuid());
-                strike->setDesc("New Task" + QString::number(m_strikes.size() + 1));
+                strike->setDesc("New Task" + QString::number(board->getItems()->size() + 1));
                 strike->setStatus(Strike::NewAdd);
                 strike->setCreated(QDateTime::currentDateTime());
                 strike->setUpdated(QDateTime::currentDateTime());
 
-                m_strikes.insert(row, strike);
+                board->getItems()->insert(row, strike);
         }
 
         endInsertRows();
@@ -126,7 +126,7 @@ bool StrikeListModel::removeRows(int row, int count, const QModelIndex &parent) 
         beginRemoveRows(parent, row, row + count - 1);
 
         for(int i = 0; i < count; ++i) {
-                m_strikes.removeAt(row + i);
+          board->getItems()->removeAt(row + i);
         }
 
         endRemoveRows();
@@ -157,7 +157,7 @@ bool StrikeListModel::moveRow(int sourceRow, int destRow) {
                 return false;
 
         //数据移动
-        m_strikes.move(sourceRow, oldDestRow);
+        board->getItems()->move(sourceRow, oldDestRow);
         qDebug("======Done moveRow --- sourceRow: %d destRow: %d ->lastDestRow: %d", sourceRow, oldDestRow, destRow);
 
         endMoveRows();
@@ -188,18 +188,6 @@ bool StrikeListModel::removeStrike(int index) {
         return true;
 }
 
-QList<Strike*> StrikeListModel::strikes() const {
-        return m_strikes;
-}
-
-void StrikeListModel::setStrikes(const QList<Strike*> &strikes) {
-        beginResetModel();
-
-        m_strikes = strikes;
-
-        endResetModel();
-
-}
 
 Board *StrikeListModel::getBoard() const
 {
@@ -208,5 +196,10 @@ Board *StrikeListModel::getBoard() const
 
 void StrikeListModel::setBoard(Board *value)
 {
+  beginResetModel();
+
   board = value;
+
+  endResetModel();
+
 }

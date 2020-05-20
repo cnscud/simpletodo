@@ -63,8 +63,9 @@ class Board: public QObject {
 
 
 
-  QList<Strike *> getItems() const;
-  void setItems(const QList<Strike *> &items);
+
+  QList<Strike *> *getItems() const;
+  void setItems(QList<Strike *> *items);
 
 private:
   QString bid; //唯一key: UUID ?
@@ -75,15 +76,15 @@ private:
 
   bool hiddenArchived = false; //是否隐藏归档的任务
 
-  QDateTime created = QDateTime::fromString("2000-01-01 12:00:00"); //创建时间
-  QDateTime updated = QDateTime::fromString("2000-01-01 12:00:00"); //更新时间
+  QDateTime created = QDateTime::fromString("2000-01-01 12:00:00", "yyyy-MM-dd hh:mm:ss"); //创建时间
+  QDateTime updated = QDateTime::fromString("2000-01-01 12:00:00", "yyyy-MM-dd hh:mm:ss"); //更新时间
 
   int windowX= 100; //窗口X坐标, 启动时要检查窗口, 不合适则自动重置
   int windowY = 100; //窗口Y坐标
   int windowWidth = 60; //窗口宽度
   int windowHeight = 200; //窗口高度
 
-  QList<Strike*> mItems; //任务列表
+  QList<Strike*>* mItems; //任务列表
 
 };
 

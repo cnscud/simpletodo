@@ -26,7 +26,7 @@ bool Board::setItemAt(int index, const Strike &item) {
 */
 
 int Board::size() const {
-        return mItems.size();
+  return mItems->size();
 }
 
 void Board::appendNewItem(QString &desc) {
@@ -42,7 +42,7 @@ void Board::appendNewItem(QString &desc) {
         strike.setCreated(QDateTime::currentDateTime());
         strike.setUpdated(QDateTime::currentDateTime());
 
-        mItems.append(&strike);
+        mItems->append(&strike);
 }
 
 void Board::insertNewItem(int index, QString &desc) {
@@ -58,7 +58,7 @@ void Board::insertNewItem(int index, QString &desc) {
         strike.setCreated(QDateTime::currentDateTime());
         strike.setUpdated(QDateTime::currentDateTime());
 
-        mItems.insert(index, &strike);
+        mItems->insert(index, &strike);
 }
 
 
@@ -147,15 +147,16 @@ void Board::setFontSize(int value)
   fontSize = value;
 }
 
-QList<Strike *> Board::getItems() const
+QList<Strike *> *Board::getItems() const
 {
   return mItems;
 }
 
-void Board::setItems(const QList<Strike *> &items)
+void Board::setItems(QList<Strike *> *items)
 {
   mItems = items;
 }
+
 
 QDateTime Board::getCreated() const {
   return created;
