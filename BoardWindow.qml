@@ -8,7 +8,6 @@ Window {
     id: window
 
     //Designer 竟然不支持..., 设计模式时要注意
-    //@FIXME 最后要打开
     flags: Qt.FramelessWindowHint
 
     visible: !model.hidden

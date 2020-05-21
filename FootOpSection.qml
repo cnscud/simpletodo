@@ -31,6 +31,7 @@ Rectangle {
 
     }
 
+    /*
     Button {
         text: qsTr("New Board --- Todo ")
         height: parent.height
@@ -41,10 +42,8 @@ Rectangle {
         onClicked: {
             //Todo: just for test 新增新窗口
             windowModel.addBoard();
-
-            //windowModel.append({"title": "Window #" + (windowModel.count + 1)                               })
         }
-    }
+    }*/
 
     //resize区域
     MouseArea {

@@ -1,8 +1,8 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.5
 import QtQuick.Window 2.3
-import QtQuick.Dialogs 1.1
 import QtQml.Models 2.1
+import QtQuick.Dialogs 1.2
 
 import StrikeTodo 1.0
 
@@ -36,8 +36,9 @@ Rectangle {
         //height: 20
         anchors.fill: parent
         
-        acceptedButtons: Qt.LeftButton
-        
+        //支持右键菜单: 编辑模式下不需要
+        acceptedButtons: titleEditMode? Qt.LeftButton : ( Qt.LeftButton | Qt.RightButton)
+
         property point clickPos: "0,0"
         
         onPressed: {
@@ -68,7 +69,88 @@ Rectangle {
             titleTextinput.focus = true;
         }
 
+        onClicked: {
+            //右键菜单
+            if (mouse.button === Qt.RightButton){
+                titleContextMenu.popup()
+            }
+        }
+
     }
+
+    CoodMenu {
+          id: titleContextMenu
+          itemWidth: 180
+          //编辑状态则不需要右键菜单
+          enabled: !titleEditMode
+
+          Action { text: "删除此白板"
+              onTriggered: {
+                  //属性绑定, 不关闭会crash...
+                  titleContextMenu.close();
+                  //询问对话框
+                  deleteConfirmDialog.open();
+              }
+          }
+
+          Action { text: "背景色..."
+              onTriggered: {
+                  backColorDialog.open();
+              }
+          }
+
+          CoodMenu {
+              title: "字体大小"
+              Action { text: "最大"
+                  checked: model.fontSize ===30
+                  onTriggered: {
+                      model.fontSize = 30;
+                  }
+              }
+              Action { text: "较大"
+                  checked: model.fontSize ===24
+                  onTriggered: {
+                      model.fontSize = 24;
+                  }
+              }
+              Action { text: "适中"
+                  checked: model.fontSize ===18
+                  onTriggered: {
+                      model.fontSize = 18;
+                  }
+              }
+              Action { text: "较小"
+                  checked: model.fontSize ===14
+                  onTriggered: {
+                      model.fontSize = 14;
+                  }
+              }
+              Action { text: "最小"
+                  checked: model.fontSize ===9
+                  onTriggered: {
+                      model.fontSize = 9;
+                  }
+              }
+
+          }
+
+    }
+
+    //背景色选择
+    ColorDialog {
+        id: backColorDialog
+        modality: Qt.ApplicationModal
+
+        title: "请选择背景色"
+              onAccepted: {
+                  model.backColor = color;
+              }
+              onRejected: {
+                  console.log("Canceled")
+        }
+        //Component.onCompleted: visible = true
+    }
+
     
     Button {
         id: closeButton
@@ -89,9 +171,8 @@ Rectangle {
         font.pointSize: 14
 
         onClicked: {
-            //TODO 设置Board的状态为隐藏: 应该提示用户
+            //设置Board的状态为隐藏: 应该提示用户
             closeConfirmDialog.open();
-            //window.close()
         }
     }
     
@@ -153,8 +234,7 @@ Rectangle {
                 model.updated = new Date();
 
                 //恢复正常显示
-                titleEditMode = false;
-
+                titleEditMode = false;                
             }
         } //end titleTextinput
 
@@ -207,33 +287,34 @@ Rectangle {
         }
 
         //anchors.topMargin: 1
-
     }
 
     
-    
-    MessageDialog {
-        id: messageDialog
-        icon: StandardIcon.Information
-        title: "New Strike will added"
-        text: "I will create a new Strike"
         
-        onAccepted: {
-        }
-    }
-    
     MessageDialog {
         id: closeConfirmDialog
         title: "关掉白板"
         icon: StandardIcon.Question
         text: "你要关闭这个白板吗? 你可以在菜单里重新打开"
-        standardButtons: StandardButton.Yes |  StandardButton.No
-        onYes: {
+        //informativeText: "hello"
+        standardButtons: StandardButton.Ok |  StandardButton.Cancel
+        onAccepted: {
             //设置隐藏
             model.hidden = true;
             window.close()
         }
     }
     
-    
+    MessageDialog {
+        id: deleteConfirmDialog
+        //title: "删除白板"
+        icon: StandardIcon.Question
+        text: "你要删除这个白板吗? 此白板的数据将全部被删除, 并且不可恢复!"
+        standardButtons: StandardButton.Ok |  StandardButton.Cancel
+        onAccepted: {
+            //移除当前白板
+            windowModel.removeBoard(index);
+        }
+    }
+
 }

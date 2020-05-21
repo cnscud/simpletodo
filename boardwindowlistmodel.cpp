@@ -189,9 +189,20 @@ bool BoardWindowListModel::removeRows(int row, int count, const QModelIndex &par
 
 
         for(int i = 0; i < count; ++i) {
-                m_boards->removeAt(row+i);
+
+                BoardModelProxy* boardProxy = m_boardModelProxys->at(row);
+                StrikeListModel* slm = boardProxy->strikeListModel();
+                //是否需要哪???
+                slm->disconnect();
+
+                //销毁对象: 是否需要手工销毁关联的子对象哪?
+                delete m_boardModelProxys->at(row + i);
+                delete m_boards->at(row + i);
+
                 m_boardModelProxys->removeAt(row + i);
+                m_boards->removeAt(row + i);
         }
+
 
         endRemoveRows();
         return true;
@@ -201,6 +212,14 @@ bool BoardWindowListModel::addBoard() {
         qDebug("add Board");
         insertRows(0, 1, QModelIndex());
         qDebug("end add Board");
+
+        return true;
+}
+
+bool BoardWindowListModel::removeBoard(int index) {
+        qDebug("remove Board....%d ", index);
+        removeRows(index, 1, QModelIndex());
+        qDebug("remove Board.... end");
 
         return true;
 }

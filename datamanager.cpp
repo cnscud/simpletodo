@@ -182,7 +182,7 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr) {
 QString DataManager::pickDataFilePathName() {
 
         //debug
-        qDebug("hello %s", qPrintable(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)));
+        //qDebug("hello %s", qPrintable(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)));
 
         QString pathRoot = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)  + "/";
 

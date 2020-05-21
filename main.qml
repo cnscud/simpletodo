@@ -27,6 +27,11 @@ Item {
             id: window
         }
 
+        onObjectRemoved: {
+            console.debug("removed from windowModel: " + index);
+        }
+
+
 
     }
 

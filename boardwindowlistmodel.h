@@ -50,6 +50,7 @@ class BoardWindowListModel : public QAbstractListModel
 
   //新增一个白板
   Q_INVOKABLE bool addBoard();
+  Q_INVOKABLE bool removeBoard(int index);
 
 
   QList<BoardModelProxy *> *boardModelProxys() const;

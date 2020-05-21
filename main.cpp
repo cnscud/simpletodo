@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 {
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-  QGuiApplication app(argc, argv);
+  QApplication app(argc, argv);
 
   //所有窗口关闭程序也不退出 Todo 最后打开 而且应该提示用户
   //QApplication::setQuitOnLastWindowClosed(false);
@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
     QObject::connect(slm, &StrikeListModel::rowsInserted, &dataMan, &DataManager::strikeModelRowsInserted);
     QObject::connect(slm, &StrikeListModel::rowsMoved, &dataMan, &DataManager::strikeModelRowsMoved);
     QObject::connect(slm, &StrikeListModel::rowsRemoved, &dataMan, &DataManager::strikeModelRowsRemoved);
+
   }
 
 

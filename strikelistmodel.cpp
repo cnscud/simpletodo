@@ -126,6 +126,8 @@ bool StrikeListModel::removeRows(int row, int count, const QModelIndex &parent) 
         beginRemoveRows(parent, row, row + count - 1);
 
         for(int i = 0; i < count; ++i) {
+          //销毁对象
+          delete board->getItems()->at(row +i);
           board->getItems()->removeAt(row + i);
         }
 
@@ -182,7 +184,6 @@ bool StrikeListModel::addStrike() {
 }
 
 bool StrikeListModel::removeStrike(int index) {
-        //Todo 如何通知数据管理员数据已经更新了哪?
 
         removeRows(index, 1, QModelIndex());
         return true;
