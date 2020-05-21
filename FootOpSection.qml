@@ -40,9 +40,9 @@ Rectangle {
 
         onClicked: {
             //Todo: just for test 新增新窗口
-            windowModel.append({
-                                   "title": "Window #" + (windowModel.count + 1)
-                               })
+            windowModel.addBoard();
+
+            //windowModel.append({"title": "Window #" + (windowModel.count + 1)                               })
         }
     }
 

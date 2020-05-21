@@ -90,8 +90,8 @@ Rectangle {
 
         onClicked: {
             //TODO 设置Board的状态为隐藏: 应该提示用户
-            //closeConfirmDialog.open();
-            window.close()
+            closeConfirmDialog.open();
+            //window.close()
         }
     }
     
@@ -229,6 +229,8 @@ Rectangle {
         text: "你要关闭这个白板吗? 你可以在菜单里重新打开"
         standardButtons: StandardButton.Yes |  StandardButton.No
         onYes: {
+            //设置隐藏
+            model.hidden = true;
             window.close()
         }
     }

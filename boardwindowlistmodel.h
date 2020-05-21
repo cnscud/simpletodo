@@ -33,12 +33,10 @@ class BoardWindowListModel : public QAbstractListModel
   };
 
 
-  // Basic functionality:
   int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-  // Editable:
   bool setData(const QModelIndex &index, const QVariant &value,
                int role = Qt::EditRole) override;
 
@@ -46,22 +44,26 @@ class BoardWindowListModel : public QAbstractListModel
   QHash<int, QByteArray> roleNames() const override;
 
 
-
-  // Add data:
   bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-
-  // Remove data:
   bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 
+  //新增一个白板
+  Q_INVOKABLE bool addBoard();
 
-  QList<BoardModelProxy*> boardModelProxys() const;
-  void setBoardModelProxys(const QList<BoardModelProxy*> &boardModelProxys);
 
+  QList<BoardModelProxy *> *boardModelProxys() const;
+  //void setBoardModelProxys(QList<BoardModelProxy *> *boardModelProxys);
+
+  QList<Board *> *boards() const;
+  //void setBoards(QList<Board *> *boards);
+
+  void setBoardsAndProxy(QList<Board *> *boards);
 
 private:
+  QList<Board*> *m_boards;
   //Board Proxy Model
-  QList<BoardModelProxy*> m_boardModelProxys;
+  QList<BoardModelProxy*> *m_boardModelProxys;
 
 
 };

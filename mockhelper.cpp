@@ -9,7 +9,7 @@ MockHelper::MockHelper()
 
 }
 
-//这个有问题, 原因未知 2020.5.20
+
 BoardWindowListModel* MockHelper::mockData()
 {
   qDebug("start mock data......");
@@ -53,7 +53,7 @@ BoardWindowListModel* MockHelper::mockData()
   strikeListModel2->setBoard(board2);
 
 
-
+  /*
   BoardModelProxy* bmp1 = new BoardModelProxy();
   bmp1->setBoard(board1);
   bmp1->setStrikeListModel(strikeListModel1);
@@ -65,9 +65,14 @@ BoardWindowListModel* MockHelper::mockData()
   QList<BoardModelProxy*> boardProxyList;
   boardProxyList.append(bmp1);
   boardProxyList.append(bmp2);
+  */
+
+  QList<Board*>* boards = new QList<Board*>();
+  boards->append(board1);
+  boards->append(board2);
 
   BoardWindowListModel* bwlm  = new BoardWindowListModel();
-  bwlm->setBoardModelProxys(boardProxyList);
+  bwlm->setBoardsAndProxy(boards);
 
   qDebug("end mock data......");
 

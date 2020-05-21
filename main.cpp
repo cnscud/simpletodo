@@ -32,23 +32,8 @@ int main(int argc, char *argv[])
   QList<Board*> *boards = dataMan.readAllBoards();
 
 
-  QList<BoardModelProxy*> boardProxyList;
-  for(int i=0;i<boards->size();++i){
-    Board* board = boards->at(i);
-    BoardModelProxy* bmproxy = new BoardModelProxy();
-    bmproxy->setBoard(board);
-
-    StrikeListModel* strikeListModel = new StrikeListModel();
-    strikeListModel->setBoard(board);
-
-    bmproxy->setStrikeListModel(strikeListModel);
-
-    //add to list
-    boardProxyList.append(bmproxy);
-  }
-
   BoardWindowListModel* bwlm = new BoardWindowListModel();
-  bwlm->setBoardModelProxys(boardProxyList);
+  bwlm->setBoardsAndProxy(boards);
 
 
   //end data  ============================================
@@ -77,11 +62,11 @@ int main(int argc, char *argv[])
   QObject::connect(bwlm, &BoardWindowListModel::rowsRemoved, &dataMan, &DataManager::windowModelRowsRemoved);
 
 
-  QList<BoardModelProxy*> theBoardProxyList = bwlm->boardModelProxys();
+  QList<BoardModelProxy*>* theBoardProxyList = bwlm->boardModelProxys();
 
   //每个白板的任务列表都要监测: 方便保存数据
-  for(int i=0; i< theBoardProxyList.size();++i){
-    BoardModelProxy* proxy = theBoardProxyList.at(i);
+  for(int i=0; i< theBoardProxyList->size();++i){
+    BoardModelProxy* proxy = theBoardProxyList->at(i);
     StrikeListModel* slm = proxy->strikeListModel();
 
     //绑定事件: 但是不知道是哪个StrikeList! 自定义信号可以解决, 目前应该不需要

@@ -68,12 +68,12 @@ class Board: public QObject {
   void setItems(QList<Strike *> *items);
 
 private:
-  QString bid; //唯一key: UUID ?
+  QString bid; //唯一key: UUID
   QString title; //白板名称
-  bool hidden = false; //是否隐藏
   QString backColor = "#DAE362"; //背景色
   int fontSize = 18; //字体大小
 
+  bool hidden = false; //是否隐藏
   bool hiddenArchived = false; //是否隐藏归档的任务
 
   QDateTime created = QDateTime::fromString("2000-01-01 12:00:00", "yyyy-MM-dd hh:mm:ss"); //创建时间
@@ -81,8 +81,8 @@ private:
 
   int windowX= 100; //窗口X坐标, 启动时要检查窗口, 不合适则自动重置
   int windowY = 100; //窗口Y坐标
-  int windowWidth = 60; //窗口宽度
-  int windowHeight = 200; //窗口高度
+  int windowWidth = 200; //窗口宽度
+  int windowHeight = 400; //窗口高度
 
   QList<Strike*>* mItems; //任务列表
 

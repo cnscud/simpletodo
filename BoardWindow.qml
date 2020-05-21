@@ -11,11 +11,11 @@ Window {
     //@FIXME 最后要打开
     flags: Qt.FramelessWindowHint
 
-    visible: true
-    width: 320
-    height: 600
-    x: Screen.width / 2 - window.width / 2
-    y: Screen.height / 2 - window.height / 2
+    visible: !model.hidden
+    width: model.windowWidth
+    height: model.windowHeight
+    x: (model.windowX > Screen.width)?(Screen.width - width): model.windowX
+    y: (model.windowY > Screen.height)?(Screen.height - height): model.windowY
 
 
     title: model.title

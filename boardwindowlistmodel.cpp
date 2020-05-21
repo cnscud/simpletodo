@@ -12,14 +12,14 @@ int BoardWindowListModel::rowCount(const QModelIndex &parent) const {
         if(parent.isValid())
                 return 0;
 
-        return m_boardModelProxys.size();
+        return m_boardModelProxys->size();
 }
 
 QVariant BoardWindowListModel::data(const QModelIndex &index, int role) const {
         if(!index.isValid())
                 return QVariant();
 
-        BoardModelProxy* boardProxy = m_boardModelProxys.at(index.row());
+        BoardModelProxy* boardProxy = m_boardModelProxys->at(index.row());
         Board* board = boardProxy->board();
 
 
@@ -50,7 +50,7 @@ QVariant BoardWindowListModel::data(const QModelIndex &index, int role) const {
                         return board->getFontSize();
                 //get ListModel for listview
                 case StrikeListModelRole:
-                       return QVariant::fromValue(boardProxy->strikeListModel());
+                        return QVariant::fromValue(boardProxy->strikeListModel());
         }
 
 
@@ -62,11 +62,11 @@ bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &val
 
         if(data(index, role) != value) {
 
-          BoardModelProxy* boardProxy = m_boardModelProxys.at(index.row());
-          Board* board = boardProxy->board();;
+                BoardModelProxy* boardProxy = m_boardModelProxys->at(index.row());
+                Board* board = boardProxy->board();;
 
-          //总是更新为最新时间
-          board->setUpdated(QDateTime::currentDateTime());
+                //总是更新为最新时间
+                board->setUpdated(QDateTime::currentDateTime());
 
                 // set value
                 switch(role) {
@@ -85,14 +85,12 @@ bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &val
                         case HiddenArchivedRole:
                                 board->setHiddenArchived(value.toBool());
                                 break;
-
                         case CreatedRole:
                                 board->setCreated(value.toDateTime());
                                 break;
                         case UpdatedRole:
                                 board->setUpdated(value.toDateTime());
                                 break;
-
                         case WindowXRole:
                                 board->setWindowX(value.toInt());
                                 break;
@@ -106,8 +104,8 @@ bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &val
                                 board->setWindowHeight(value.toInt());
                                 break;
                         case FontSizeRole:
-                              board->setFontSize(value.toInt());
-                              break;
+                                board->setFontSize(value.toInt());
+                                break;
                 }
 
 
@@ -161,15 +159,24 @@ bool BoardWindowListModel::insertRows(int row, int count, const QModelIndex &par
                 Board* board = new Board();
                 board->setBid(HelpUtils::uuid());
 
-                QString newTitle =  "New Board " + QString::number(row + i);
+                QString newTitle =  "New Board " + QString::number(m_boardModelProxys->size() + i + 1);
                 board->setTitle(newTitle);
                 board->setCreated(QDateTime::currentDateTime());
                 board->setUpdated(QDateTime::currentDateTime());
 
+                QList<Strike*>* items = new QList<Strike*>();
+                board->setItems(items);
+
+                StrikeListModel* strikeListModel = new StrikeListModel();
+                strikeListModel->setBoard(board);
+
                 BoardModelProxy* bmp = new BoardModelProxy();
                 bmp->setBoard(board);
+                bmp->setStrikeListModel(strikeListModel);
 
-                m_boardModelProxys.insert(row, bmp);
+                //同时设置
+                m_boards->insert(row, board);
+                m_boardModelProxys->insert(row, bmp);
         }
 
 
@@ -182,27 +189,58 @@ bool BoardWindowListModel::removeRows(int row, int count, const QModelIndex &par
 
 
         for(int i = 0; i < count; ++i) {
-                m_boardModelProxys.removeAt(row + i);
+                m_boards->removeAt(row+i);
+                m_boardModelProxys->removeAt(row + i);
         }
 
         endRemoveRows();
         return true;
 }
 
-QList<BoardModelProxy*> BoardWindowListModel::boardModelProxys() const {
+bool BoardWindowListModel::addBoard() {
+        qDebug("add Board");
+        insertRows(0, 1, QModelIndex());
+        qDebug("end add Board");
+
+        return true;
+}
+
+
+
+QList<BoardModelProxy *> *BoardWindowListModel::boardModelProxys() const {
         return m_boardModelProxys;
 }
 
-void BoardWindowListModel::setBoardModelProxys(const QList<BoardModelProxy*> &boardModelProxys) {
+
+QList<Board *> *BoardWindowListModel::boards() const {
+        return m_boards;
+}
+
+void BoardWindowListModel::setBoardsAndProxy(QList<Board *> *boards) {
         beginResetModel();
 
-        m_boardModelProxys = boardModelProxys;
+        //初始化为了ListView需要的Model
+        QList<BoardModelProxy*>* boardProxyList = new QList<BoardModelProxy*>();
+        for(int i = 0; i < boards->size(); ++i) {
+                Board* board = boards->at(i);
+                BoardModelProxy* bmproxy = new BoardModelProxy();
+                bmproxy->setBoard(board);
 
-        //Todo 参见trytodolist项目的 todomodel, 是否需要绑定事件?
+                StrikeListModel* strikeListModel = new StrikeListModel();
+                strikeListModel->setBoard(board);
 
+                bmproxy->setStrikeListModel(strikeListModel);
+
+                //add to list
+                boardProxyList->append(bmproxy);
+        }
+
+        m_boards = boards;
+        m_boardModelProxys = boardProxyList;
 
         endResetModel();
 }
+
 
 
 
