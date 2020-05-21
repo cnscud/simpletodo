@@ -48,6 +48,8 @@ QVariant BoardWindowListModel::data(const QModelIndex &index, int role) const {
                         return board->getWindowHeight();
                 case FontSizeRole:
                         return board->getFontSize();
+                case FontFamilyRole:
+                        return board->getFontFamily();
                 //get ListModel for listview
                 case StrikeListModelRole:
                         return QVariant::fromValue(boardProxy->strikeListModel());
@@ -106,6 +108,10 @@ bool BoardWindowListModel::setData(const QModelIndex &index, const QVariant &val
                         case FontSizeRole:
                                 board->setFontSize(value.toInt());
                                 break;
+                        case FontFamilyRole:
+                          board->setFontFamily(value.toString());
+                          break;
+
                 }
 
 
@@ -144,6 +150,7 @@ QHash<int, QByteArray> BoardWindowListModel::roleNames() const {
         names[WindowWidthRole] = "windowWidth";
         names[WindowHeightRole] = "windowHeight";
         names[FontSizeRole] = "fontSize";
+        names[FontFamilyRole] = "fontFamily";
 
         names[StrikeListModelRole] = "strikeListModel";
 
@@ -223,7 +230,6 @@ bool BoardWindowListModel::removeBoard(int index) {
 
         return true;
 }
-
 
 
 QList<BoardModelProxy *> *BoardWindowListModel::boardModelProxys() const {

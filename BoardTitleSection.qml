@@ -7,8 +7,6 @@ import QtQuick.Dialogs 1.2
 import StrikeTodo 1.0
 
 
-//Todo: Model 用来设置关闭, 设置标题: 双向数据联动
-
 /**
   白板的头部操作区域.
 */
@@ -99,6 +97,12 @@ Rectangle {
               }
           }
 
+          Action { text: "字体..."
+              onTriggered: {
+                  fontDialog.open();
+              }
+          }
+
           CoodMenu {
               title: "字体大小"
               Action { text: "最大"
@@ -134,6 +138,21 @@ Rectangle {
 
           }
 
+    }
+
+
+    FontDialog {
+        id: fontDialog
+        title: "请选择一个字体"
+        font: Qt.font({ family: "Arial", pointSize: model.fontSize, weight: Font.Normal })
+        modality : Qt.WindowModal
+        onAccepted: {
+            console.log("You chose: " + fontDialog.font)
+            model.fontFamily = fontDialog.font.family;
+        }
+        onRejected: {
+            console.log("Canceled")
+        }
     }
 
     //背景色选择
@@ -258,17 +277,12 @@ Rectangle {
         font.pointSize: 22
 
         onClicked: {
-            //TODO 新增一个任务
-            //messageDialog.text = "I will create a new Strike";
-            //messageDialog.open();
             
-            var c = pListView.count
+            //var c = pListView.count
 
             //这样调用: 是最佳方法吗?
             listModel.addStrike();
 
-            //pListView.model.model.insert(0, {"description": "Buy a new book " + (c + 1),"done": false })
-            
             //设置焦点, 否则listView就没焦点了
             pListView.focus = true;
             pListView.currentIndex = 0;

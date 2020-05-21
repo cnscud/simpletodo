@@ -29,6 +29,7 @@ class BoardWindowListModel : public QAbstractListModel
     WindowWidthRole,
     WindowHeightRole,
     FontSizeRole,
+    FontFamilyRole,
     StrikeListModelRole, //特殊, 是ListModel类型的, 不是普通QList
   };
 

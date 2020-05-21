@@ -157,6 +157,16 @@ void Board::setItems(QList<Strike *> *items)
   mItems = items;
 }
 
+QString Board::getFontFamily() const
+{
+  return fontFamily;
+}
+
+void Board::setFontFamily(const QString &value)
+{
+  fontFamily = value;
+}
+
 
 QDateTime Board::getCreated() const {
   return created;

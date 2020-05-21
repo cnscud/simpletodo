@@ -86,8 +86,7 @@ Qt::ItemFlags StrikeListModel::flags(const QModelIndex &index) const {
         if(!index.isValid())
                 return Qt::NoItemFlags;
 
-        //Todo 看看效果 Selectable
-        return Qt::ItemIsEditable | Qt::ItemIsSelectable ;
+        return Qt::ItemIsEditable ;
 }
 
 QHash<int, QByteArray> StrikeListModel::roleNames() const {

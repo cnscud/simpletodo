@@ -209,7 +209,7 @@ Rectangle {
             Rectangle {
                 id: itemRect
 
-                //Todo: 如何根据文字大小自动适应高度
+                //根据文字大小自动适应高度
                 //height: 40
                 height: textShow.height + 5
 
@@ -285,7 +285,8 @@ Rectangle {
                         color: model.textColor
                         font.bold: model.fontStyle.includes("bold")
                         //字体大小
-                        font.pixelSize: fontSize
+                        font.pointSize: fontSize
+                        font.family: fontFamily
                         
                         //底部留点空间
                         bottomPadding: 3
@@ -298,7 +299,8 @@ Rectangle {
                         anchors.bottom: parent.bottom
                         
                         color: "blue"
-                        font.pixelSize: fontSize
+                        font.pointSize: fontSize
+                        font.family: fontFamily
                         
                         //底部留点空间
                         bottomPadding: 3

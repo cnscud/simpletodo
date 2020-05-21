@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 
   QApplication app(argc, argv);
 
-  //所有窗口关闭程序也不退出 Todo 最后打开 而且应该提示用户
+  //所有窗口关闭程序也不退出 Todo 最后打开 而且应该对话框提示用户
   //QApplication::setQuitOnLastWindowClosed(false);
 
 

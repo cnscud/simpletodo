@@ -67,11 +67,15 @@ class Board: public QObject {
   QList<Strike *> *getItems() const;
   void setItems(QList<Strike *> *items);
 
+  QString getFontFamily() const;
+  void setFontFamily(const QString &value);
+
 private:
   QString bid; //唯一key: UUID
   QString title; //白板名称
   QString backColor = "#DAE362"; //背景色
   int fontSize = 18; //字体大小
+  QString fontFamily = "Arial"; //字体类型
 
   bool hidden = false; //是否隐藏
   bool hiddenArchived = false; //是否隐藏归档的任务

@@ -78,8 +78,6 @@ void DataManager::strikeModelRowsRemoved(const QModelIndex &parent, int first, i
 
 
 
-
-
 QList<Board*>* DataManager::readAllBoards() {
         QJsonDocument doc = readDataFromFile();
 
@@ -133,6 +131,10 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr) {
 
         if(oneSection.contains("fontSize")){
           board->setFontSize(oneSection["fontSize"].toInt());
+        }
+
+        if(oneSection.contains("fontFamily")){
+          board->setFontFamily(oneSection["fontFamily"].toString());
         }
 
         board->setHiddenArchived(oneSection["hiddenArchived"].toBool());
@@ -254,6 +256,7 @@ void DataManager::doSaveData() {
     boardObj["hidden"] = board->getHidden();
     boardObj["backColor"] = board->getBackColor();
     boardObj["fontSize"] = board->getFontSize();
+    boardObj["fontFamily"] = board->getFontFamily();
     boardObj["hiddenArchived"] = board->getHiddenArchived();
     boardObj["windowX"] = board->getWindowX();
     boardObj["windowY"] = board->getWindowY();

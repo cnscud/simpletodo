@@ -33,14 +33,14 @@ Rectangle {
 
     /*
     Button {
-        text: qsTr("New Board --- Todo ")
+        text: qsTr("New Board ")
         height: parent.height
         anchors.right: parent.right
         anchors.rightMargin: 20
         anchors.bottom: parent.bottom
 
         onClicked: {
-            //Todo: just for test 新增新窗口
+            //just for test 新增新窗口
             windowModel.addBoard();
         }
     }*/
