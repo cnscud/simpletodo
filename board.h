@@ -5,12 +5,15 @@
 #include <QDateTime>
 #include <strike.h>
 
-class Board: public QObject {
-  Q_OBJECT
+class Board  {
+  //Q_OBJECT
 
 
  public:
   Board();
+  Board(bool fromScratch);
+
+  ~Board();
 
   //QList<Strike*> items() const;
 
@@ -18,8 +21,13 @@ class Board: public QObject {
   //bool setItemAt(int index, const Strike &item);
 
   int size() const;
+
   void appendNewItem(QString &desc);
   void insertNewItem(int index, QString &desc);
+
+
+  void insertItem(Strike* strike);
+  void appendItem(Strike* strike);
 
   //setter & getter
   QString getBid() const;
@@ -88,7 +96,7 @@ private:
   int windowWidth = 200; //窗口宽度
   int windowHeight = 400; //窗口高度
 
-  QList<Strike*>* mItems; //任务列表
+  QList<Strike*>* mItems = nullptr; //任务列表
 
 };
 

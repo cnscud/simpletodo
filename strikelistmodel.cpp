@@ -2,7 +2,7 @@
 #include "helputils.h"
 
 StrikeListModel::StrikeListModel(QObject *parent)
-        : QAbstractListModel(parent) {
+  : QAbstractListModel(parent) {
 }
 
 int StrikeListModel::rowCount(const QModelIndex &parent) const {
@@ -186,6 +186,22 @@ bool StrikeListModel::removeStrike(int index) {
 
         removeRows(index, 1, QModelIndex());
         return true;
+}
+
+bool StrikeListModel::archivedStrike(int index)
+{
+  Strike* strike = board->getItems()->at(index);
+
+  //为了安全, copy 一份
+  Strike* newStrike(strike);
+
+  //通知
+  emit strikeArchived(board->getBid(), newStrike);
+
+  //移除
+  removeRows(index, 1, QModelIndex());
+
+  return true;
 }
 
 

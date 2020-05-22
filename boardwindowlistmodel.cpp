@@ -5,7 +5,13 @@
 #include <QDebug>
 
 BoardWindowListModel::BoardWindowListModel(QObject *parent)
-        : QAbstractListModel(parent) {
+  : QAbstractListModel(parent) {
+}
+
+BoardWindowListModel::~BoardWindowListModel()
+{
+  qDeleteAll(m_boardModelProxys->begin(), m_boardModelProxys->end());
+  delete m_boardModelProxys;
 }
 
 int BoardWindowListModel::rowCount(const QModelIndex &parent) const {

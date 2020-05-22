@@ -29,7 +29,8 @@ class DataManager : public QObject
   void strikeModelRowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
   void strikeModelRowsRemoved(const QModelIndex &parent, int first, int last);
 
-
+  //归档数据
+  void archivedStrike(QString bid, Strike* strike);
 
   //读取所有数据
   QList<Board*> *readAllBoards();
@@ -41,7 +42,8 @@ class DataManager : public QObject
 
 
  private:
-  QList<Board*> *mBoards;
+  QList<Board*> *m_boards = new QList<Board*>();
+  QList<Board*> *m_archivedBoards = new QList<Board*>(); //归档的任务: 按原Board分类, 一一对应
 
   QString pickDataFilePathName();
   QJsonDocument readDataFromFile();

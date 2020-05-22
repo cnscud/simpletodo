@@ -16,9 +16,7 @@ void DataManager::windowModelDataChanged(const QModelIndex &topLeft, const QMode
 
         qDebug("[windowModelDataChanged] row %d to row %d", topLeft.row(), bottomRight.row());
 
-        //Save Model Data
         fireSaveData();
-
 }
 
 void DataManager::windowModelRowsInserted(const QModelIndex &parent, int first, int last) {
@@ -76,6 +74,59 @@ void DataManager::strikeModelRowsRemoved(const QModelIndex &parent, int first, i
         fireSaveData();
 }
 
+void DataManager::archivedStrike(QString bid, Strike *strike)
+{
+  qDebug("catch a archived Strike singal: %s", qPrintable(strike->getDesc()));
+
+
+  Board* destArchivedBoard = nullptr;
+
+  //查找Board, 如果不存在, 则创建一个
+  for(int i=0; i<m_archivedBoards->size();++i){
+    Board* archivedBoard = m_archivedBoards->at(i);
+    if(archivedBoard->getBid() == bid) {
+      destArchivedBoard = archivedBoard;
+      break;
+    }
+  }
+
+  if(destArchivedBoard == nullptr){
+
+    Board* destBoard = nullptr;
+    for(int i=0; i<m_boards->size();++i){
+      Board* aboard = m_boards->at(i);
+      if(aboard->getBid() == bid) {
+        destBoard = aboard;
+        break;
+      }
+    }
+
+    //竟然没有这个Board
+    if(destBoard == nullptr){
+      qErrnoWarning("Not find the board %s for archived strikes", qPrintable(bid));
+
+      //啥也不干....
+      return;
+    }
+
+    destArchivedBoard = new Board(true);
+    //设置Bid, Title
+    destArchivedBoard->setBid(bid);
+
+  }
+
+  //加入任务
+  destArchivedBoard->insertItem(strike);
+
+
+  qDebug("end catch archived Strike signal");
+
+  //存储
+  fireSaveData();
+
+  qDebug("fire archived Strike signal --> save data");
+}
+
 
 
 QList<Board*>* DataManager::readAllBoards() {
@@ -87,7 +138,7 @@ QList<Board*>* DataManager::readAllBoards() {
         if(json.contains("all") && json["all"].isArray()) {
                 QJsonArray allArray = json["all"].toArray();
 
-                QList<Board*> *todoLists = new QList<Board*>();
+                QList<Board*> *boardList = new QList<Board*>();
 
                 for(int n = 0; n < allArray.size(); ++n) {
                         QString listName = allArray[n].toString();
@@ -95,14 +146,22 @@ QList<Board*>* DataManager::readAllBoards() {
                         //读一个任务列表
                         Board* oneList = parseOneBoard(json, listName);
 
-                        todoLists->append(oneList);
+                        boardList->append(oneList);
                 }
 
-                mBoards = todoLists; //
-                return todoLists;
+                m_boards = boardList; //
         }
 
-        return new QList<Board*>();
+        //没数据
+        if(m_boards == nullptr) {
+          m_boards = new QList<Board*>();
+        }
+
+        //todo 读取归档数据
+        //m_archivedBoards  = new QList<Board*>();
+
+
+        return m_boards;
 }
 
 
@@ -245,8 +304,8 @@ void DataManager::doSaveData() {
   QJsonObject saveObject;
 
   QJsonArray allArray;
-  for(int n = 0; n < mBoards->size(); ++n) {
-    Board* board = mBoards->at(n);
+  for(int n = 0; n < m_boards->size(); ++n) {
+    Board* board = m_boards->at(n);
 
     allArray.append(board->getBid());
 
@@ -291,6 +350,9 @@ void DataManager::doSaveData() {
   }
 
   saveObject["all"] = allArray;
+
+  //Todo 保存已归档的数据
+
 
 
   QString pathName = pickDataFilePathName();

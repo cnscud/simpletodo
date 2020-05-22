@@ -46,22 +46,22 @@ class StrikeListModel : public QAbstractListModel
 
   Q_INVOKABLE bool moveRow(int sourceRow, int destRow);
 
-  // 在QML里直接调用来生成一个新行
+  // Q_INVOKABLE 在QML里直接
   Q_INVOKABLE bool addStrike();
   Q_INVOKABLE bool removeStrike(int index);
-
-
-  //QList<Strike*> strikes() const;
-  //void setStrikes(const QList<Strike*> &strikes);
-
+  Q_INVOKABLE bool archivedStrike(int index);
 
 
   Board *getBoard() const;
   void setBoard(Board *value);
 
+  //信号发生
+ signals:
+  void strikeArchived(QString bid, Strike* strike);
+
+
 private:
   Board* board; //父节点
-  //QList<Strike*> m_strikes;
 
 };
 

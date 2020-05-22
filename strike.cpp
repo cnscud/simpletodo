@@ -5,6 +5,17 @@ Strike::Strike()
 
 }
 
+Strike::Strike(const Strike &s2)
+{
+  sid = s2.sid;
+  desc = s2.desc;
+  status = s2.status;
+  textColor = s2.textColor;
+  fontStyle = s2.fontStyle;
+  created = s2.created;
+  updated = s2.updated;
+}
+
 QString Strike::getSid() const
 {
     return sid;

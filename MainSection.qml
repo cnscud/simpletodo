@@ -130,12 +130,6 @@ Rectangle {
                   id: contextMenu
                   itemWidth: 180
 
-                  Action { text: "删除当前任务"
-                      onTriggered: {
-                          console.debug("remove row " + index);
-                          listModel.removeStrike(index);
-                      }
-                  }
                   CoodMenu {
                         title: "标记状态为"
 
@@ -163,6 +157,7 @@ Rectangle {
                   }
 
                   MenuSeparator { }
+
 
                   CoodMenu {
                         title: "字体设置"
@@ -201,6 +196,22 @@ Rectangle {
                             }
                         }
                   }
+
+                  MenuSeparator { }
+
+                  Action { text: "删除当前任务"
+                      onTriggered: {
+                          console.debug("remove row " + index);
+                          listModel.removeStrike(index);
+                      }
+                  }
+                  Action { text: "归档当前任务"
+                      onTriggered: {
+                          console.debug("archived row " + index);
+                          listModel.archivedStrike(index);
+                      }
+                  }
+
 
             }
 

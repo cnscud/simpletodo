@@ -75,6 +75,9 @@ int main(int argc, char *argv[])
     QObject::connect(slm, &StrikeListModel::rowsMoved, &dataMan, &DataManager::strikeModelRowsMoved);
     QObject::connect(slm, &StrikeListModel::rowsRemoved, &dataMan, &DataManager::strikeModelRowsRemoved);
 
+    //归档
+    QObject::connect(slm, &StrikeListModel::strikeArchived, &dataMan, &DataManager::archivedStrike);
+
   }
 
 

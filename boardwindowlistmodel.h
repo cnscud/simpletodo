@@ -13,6 +13,7 @@ class BoardWindowListModel : public QAbstractListModel
 
  public:
   explicit BoardWindowListModel(QObject *parent = nullptr);
+  ~BoardWindowListModel();
 
 
   //不要留空行: 有时候莫名其妙出错

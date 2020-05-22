@@ -7,6 +7,19 @@ Board::Board() {
 
 }
 
+Board::Board(bool fromScratch)
+{
+  if(fromScratch){
+    mItems = new QList<Strike*>();
+  }
+}
+
+Board::~Board()
+{
+  qDeleteAll(mItems->begin(), mItems->end());
+  delete mItems;
+}
+
 
 /*
 bool Board::setItemAt(int index, const Strike &item) {
@@ -59,6 +72,16 @@ void Board::insertNewItem(int index, QString &desc) {
         strike.setUpdated(QDateTime::currentDateTime());
 
         mItems->insert(index, &strike);
+}
+
+void Board::insertItem(Strike *strike)
+{
+  mItems->insert(0, strike);
+}
+
+void Board::appendItem(Strike *strike)
+{
+  mItems->append(strike);
 }
 
 

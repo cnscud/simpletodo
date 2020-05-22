@@ -5,11 +5,12 @@
 #include <QDateTime>
 #include "consts.h"
 
-class Strike: public QObject {
-  Q_OBJECT
+class Strike  {
+  //Q_OBJECT
 
 public:
   Strike();
+  Strike(const Strike &s2);
 
   //任务完成状态
   enum StrikeStatus
