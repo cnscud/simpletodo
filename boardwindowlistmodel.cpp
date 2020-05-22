@@ -172,6 +172,16 @@ bool BoardWindowListModel::insertRows(int row, int count, const QModelIndex &par
                 board->setUpdated(QDateTime::currentDateTime());
 
                 QList<Strike*>* items = new QList<Strike*>();
+
+                Strike* strike = new Strike();
+                strike->setSid(HelpUtils::uuid());
+                strike->setDesc("New Task");
+                strike->setStatus(Strike::NewAdd);
+                strike->setCreated(QDateTime::currentDateTime());
+                strike->setUpdated(QDateTime::currentDateTime());
+
+                items->append(strike);
+
                 board->setItems(items);
 
                 StrikeListModel* strikeListModel = new StrikeListModel();

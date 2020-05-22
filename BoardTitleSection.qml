@@ -167,7 +167,6 @@ Rectangle {
               onRejected: {
                   console.log("Canceled")
         }
-        //Component.onCompleted: visible = true
     }
 
     
