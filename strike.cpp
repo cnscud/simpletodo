@@ -5,6 +5,7 @@ Strike::Strike()
 
 }
 
+//clone
 Strike::Strike(const Strike &s2)
 {
   sid = s2.sid;
@@ -14,6 +15,17 @@ Strike::Strike(const Strike &s2)
   fontStyle = s2.fontStyle;
   created = s2.created;
   updated = s2.updated;
+}
+
+void Strike::cloneStrike(Strike *s2)
+{
+  sid = s2->getSid();
+  desc = s2->getDesc();
+  status = s2->getStatus();
+  textColor = s2->getTextColor();
+  fontStyle = s2->getFontStyle();
+  created = s2->getCreated();
+  updated = s2->getUpdated();
 }
 
 QString Strike::getSid() const

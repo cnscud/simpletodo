@@ -30,7 +30,7 @@ class DataManager : public QObject
   void strikeModelRowsRemoved(const QModelIndex &parent, int first, int last);
 
   //归档数据
-  void archivedStrike(QString bid, Strike* strike);
+  void archivedStrike(QString bid, Strike &strike);
 
   //读取所有数据
   QList<Board*> *readAllBoards();
@@ -41,7 +41,10 @@ class DataManager : public QObject
   void fireSaveData();
 
 
- private:
+protected:
+   QJsonObject transferBoardToJson(Board* board, bool archived);
+
+private:
   QList<Board*> *m_boards = new QList<Board*>();
   QList<Board*> *m_archivedBoards = new QList<Board*>(); //归档的任务: 按原Board分类, 一一对应
 

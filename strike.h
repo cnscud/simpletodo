@@ -11,6 +11,7 @@ class Strike  {
 public:
   Strike();
   Strike(const Strike &s2);
+  void cloneStrike(Strike* strike);
 
   //任务完成状态
   enum StrikeStatus

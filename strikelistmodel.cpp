@@ -191,12 +191,10 @@ bool StrikeListModel::removeStrike(int index) {
 bool StrikeListModel::archivedStrike(int index)
 {
   Strike* strike = board->getItems()->at(index);
-
-  //为了安全, copy 一份
-  Strike* newStrike(strike);
+  Strike destStrike(*strike);
 
   //通知
-  emit strikeArchived(board->getBid(), newStrike);
+  emit strikeArchived(board->getBid(), destStrike);
 
   //移除
   removeRows(index, 1, QModelIndex());
