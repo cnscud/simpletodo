@@ -13,6 +13,7 @@ class DataManager : public QObject
  public:
   DataManager();
   const QString dataFileName = "simpletodo.json"; //文件名
+  const QString archived_prefix = "archived_";
 
 
   //白板列表模型数据变化
@@ -50,7 +51,7 @@ private:
 
   QString pickDataFilePathName();
   QJsonDocument readDataFromFile();
-  Board* parseOneBoard(QJsonObject &json, QString &abbr);
+  Board* parseOneBoard(QJsonObject &json, QString &abbr, bool archived);
 
 
 };

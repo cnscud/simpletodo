@@ -17,6 +17,7 @@ Strike::Strike(const Strike &s2)
   updated = s2.updated;
 }
 
+/*
 void Strike::cloneStrike(Strike *s2)
 {
   sid = s2->getSid();
@@ -26,7 +27,7 @@ void Strike::cloneStrike(Strike *s2)
   fontStyle = s2->getFontStyle();
   created = s2->getCreated();
   updated = s2->getUpdated();
-}
+}*/
 
 QString Strike::getSid() const
 {

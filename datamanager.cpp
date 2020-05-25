@@ -74,61 +74,62 @@ void DataManager::strikeModelRowsRemoved(const QModelIndex &parent, int first, i
         fireSaveData();
 }
 
-void DataManager::archivedStrike(QString bid, Strike &strike)
-{
-  qDebug("catch a archived Strike singal: %s", qPrintable(strike.getSid()));
+void DataManager::archivedStrike(QString bid, Strike &strike) {
+        qDebug("catch a archived Strike singal: %s", qPrintable(strike.getSid()));
 
 
-  Board* destBoard = nullptr;
-  for(int i = 0; i < m_boards->size(); ++i) {
-    Board* aboard = m_boards->at(i);
-    if(aboard->getBid() == bid) {
-      destBoard = aboard;
-      break;
-    }
-  }
+        Board* destBoard = nullptr;
+        for(int i = 0; i < m_boards->size(); ++i) {
+                Board* aboard = m_boards->at(i);
+                if(aboard->getBid() == bid) {
+                        destBoard = aboard;
+                        break;
+                }
+        }
 
-  //竟然没有这个Board
-  if(destBoard == nullptr) {
-    qErrnoWarning("Not find the board %s for archived strikes", qPrintable(bid));
+        //竟然没有这个Board
+        if(destBoard == nullptr) {
+                qErrnoWarning("Not find the board %s for archived strikes", qPrintable(bid));
 
-    //啥也不干....
-    return;
-  }
+                //啥也不干....
+                return;
+        }
 
-  Strike destStrike = strike;
+        Strike destStrike = strike;
 
-  Board* destArchivedBoard = nullptr;
+        Board* destArchivedBoard = nullptr;
 
-  //查找Board, 如果不存在, 则创建一个
-  for(int i = 0; i < m_archivedBoards->size(); ++i) {
-    Board* archivedBoard = m_archivedBoards->at(i);
-    if(archivedBoard->getBid() == bid) {
-      destArchivedBoard = archivedBoard;
-      break;
-    }
-  }
+        QString archived_bid = archived_prefix + bid;
 
-  if(destArchivedBoard == nullptr) {
-    destArchivedBoard = new Board(true);
-    m_archivedBoards->append(destArchivedBoard);
-  }
+        //查找Board, 如果不存在, 则创建一个
+        for(int i = 0; i < m_archivedBoards->size(); ++i) {
+                Board* archivedBoard = m_archivedBoards->at(i);
+                if(archivedBoard->getBid() == archived_bid) {
+                        destArchivedBoard = archivedBoard;
+                        break;
+                }
+        }
 
-  //设置Bid, Title
-  destArchivedBoard->setBid(bid);
-  destArchivedBoard->setTitle(destBoard->getTitle());
-  destArchivedBoard->setCreated(destBoard->getCreated());
-  destArchivedBoard->setUpdated(destBoard->getUpdated());
+        if(destArchivedBoard == nullptr) {
+                destArchivedBoard = new Board(true);
+                m_archivedBoards->append(destArchivedBoard);
+        }
 
-  //加入此归档的任务
-  destArchivedBoard->insertItem(&strike);
+        //设置Bid, Title
+        destArchivedBoard->setBid(archived_bid);
+        destArchivedBoard->setTitle(destBoard->getTitle());
+        destArchivedBoard->setCreated(destBoard->getCreated());
+        destArchivedBoard->setUpdated(destBoard->getUpdated());
 
-  qDebug("end catch archived Strike signal");
+        //加入此归档的任务
+        destArchivedBoard->insertItem(&strike);
 
-  //存储 Todo ? 需要吗
-  //fireSaveData();
+        qDebug("end catch archived Strike signal");
 
-  qDebug("fire archived Strike signal --> save data");
+        //存储 Todo ? 需要吗
+        //fireSaveData();
+
+        qDebug("fire archived Strike signal --> save data");
 }
 
 
@@ -148,7 +149,7 @@ QList<Board*>* DataManager::readAllBoards() {
                         QString listName = allArray[n].toString();
 
                         //读一个任务列表
-                        Board* oneList = parseOneBoard(json, listName);
+                        Board* oneList = parseOneBoard(json, listName, false);
 
                         boardList->append(oneList);
                 }
@@ -164,12 +165,29 @@ QList<Board*>* DataManager::readAllBoards() {
         //todo 读取归档数据
         //m_archivedBoards  = new QList<Board*>();
 
+        if(json.contains("archived_all") && json["archived_all"].isArray()) {
+          QJsonArray archivedAllArray = json["archived_all"].toArray();
+
+          QList<Board*> *archivedBoardList = new QList<Board*>();
+
+          for(int n = 0; n < archivedAllArray.size(); ++n) {
+            QString listName = archivedAllArray[n].toString();
+
+            //读一个任务列表
+            Board* oneList = parseOneBoard(json, listName, true);
+
+            archivedBoardList->append(oneList);
+          }
+
+          m_archivedBoards = archivedBoardList; //
+        }
+
 
         return m_boards;
 }
 
 
-Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr) {
+Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr, bool archived) {
         // read one board from json
         Board* board = new Board();
 
@@ -186,31 +204,33 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr) {
         QString title = oneSection["title"].toString();
         board->setTitle(title);
 
-        board->setHidden(oneSection["hidden"].toBool());
+        if(!archived) {
+            board->setHidden(oneSection["hidden"].toBool());
 
-        if(oneSection.contains("backColor")) {
-                board->setBackColor(oneSection["backColor"].toString());
+            if(oneSection.contains("backColor")) {
+                    board->setBackColor(oneSection["backColor"].toString());
+            }
+
+            if(oneSection.contains("fontSize")) {
+                    board->setFontSize(oneSection["fontSize"].toInt());
+            }
+
+            if(oneSection.contains("fontFamily")) {
+                    board->setFontFamily(oneSection["fontFamily"].toString());
+            }
+
+            board->setHiddenArchived(oneSection["hiddenArchived"].toBool());
+
+            board->setWindowX(oneSection["windowX"].toInt());
+            board->setWindowY(oneSection["windowY"].toInt());
+            board->setWindowWidth(oneSection["windowWidth"].toInt());
+            board->setWindowHeight(oneSection["windowHeight"].toInt());
         }
-
-        if(oneSection.contains("fontSize")) {
-                board->setFontSize(oneSection["fontSize"].toInt());
-        }
-
-        if(oneSection.contains("fontFamily")) {
-                board->setFontFamily(oneSection["fontFamily"].toString());
-        }
-
-        board->setHiddenArchived(oneSection["hiddenArchived"].toBool());
-
-        board->setWindowX(oneSection["windowX"].toInt());
-        board->setWindowY(oneSection["windowY"].toInt());
-        board->setWindowWidth(oneSection["windowWidth"].toInt());
-        board->setWindowHeight(oneSection["windowHeight"].toInt());
 
         board->setCreated(QDateTime::fromString(oneSection["created"].toString()));
         board->setUpdated(QDateTime::fromString(oneSection["updated"].toString()));
 
-
+        //parse Strike list
         if(oneSection.contains("items") && oneSection["items"].isArray()) {
 
                 QJsonArray itemArray = oneSection["items"].toArray();
@@ -307,15 +327,15 @@ QJsonObject DataManager::transferBoardToJson(Board* board, bool archived) {
         boardObj["title"] = board->getTitle();
 
         if(!archived) {
-          boardObj["hidden"] = board->getHidden();
-          boardObj["backColor"] = board->getBackColor();
-          boardObj["fontSize"] = board->getFontSize();
-          boardObj["fontFamily"] = board->getFontFamily();
-          boardObj["hiddenArchived"] = board->getHiddenArchived();
-          boardObj["windowX"] = board->getWindowX();
-          boardObj["windowY"] = board->getWindowY();
-          boardObj["windowWidth"] = board->getWindowWidth();
-          boardObj["windowHeight"] = board->getWindowHeight();
+                boardObj["hidden"] = board->getHidden();
+                boardObj["backColor"] = board->getBackColor();
+                boardObj["fontSize"] = board->getFontSize();
+                boardObj["fontFamily"] = board->getFontFamily();
+                boardObj["hiddenArchived"] = board->getHiddenArchived();
+                boardObj["windowX"] = board->getWindowX();
+                boardObj["windowY"] = board->getWindowY();
+                boardObj["windowWidth"] = board->getWindowWidth();
+                boardObj["windowHeight"] = board->getWindowHeight();
         }
 
         boardObj["created"] = board->getCreated().toString("yyyy-MM-dd hh:mm:ss");
@@ -369,7 +389,7 @@ void DataManager::doSaveData() {
         for(int n = 0; n < m_archivedBoards->size(); ++n) {
                 Board* board = m_archivedBoards->at(n);
 
-                QString boardKey = "archived_" + board->getBid();
+                QString boardKey = board->getBid();
 
                 archivedAllArray.append(boardKey);
 

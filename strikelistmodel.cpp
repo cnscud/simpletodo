@@ -191,6 +191,7 @@ bool StrikeListModel::removeStrike(int index) {
 bool StrikeListModel::archivedStrike(int index)
 {
   Strike* strike = board->getItems()->at(index);
+  //clone object
   Strike destStrike(*strike);
 
   //通知
