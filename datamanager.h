@@ -2,6 +2,7 @@
 #define DATAMANAGER_H
 
 #include "board.h"
+#include "helputils.h"
 
 #include <QModelIndex>
 #include <QList>
@@ -53,6 +54,7 @@ private:
   QJsonDocument readDataFromFile();
   Board* parseOneBoard(QJsonObject &json, QString &abbr, bool archived);
 
+  QList<Board*> *prepareDefaultBoard();
 
 };
 

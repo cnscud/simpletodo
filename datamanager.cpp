@@ -157,9 +157,9 @@ QList<Board*>* DataManager::readAllBoards() {
                 m_boards = boardList; //
         }
 
-        //没数据
-        if(m_boards == nullptr) {
-                m_boards = new QList<Board*>();
+        //没数据: 默认数据
+        if(m_boards == nullptr || m_boards->size() <=0) {
+          m_boards = prepareDefaultBoard();
         }
 
         //todo 读取归档数据
@@ -261,6 +261,42 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr, bool archive
 
 
         return board;
+}
+
+QList<Board *> *DataManager::prepareDefaultBoard()
+{
+  Board* board = new Board(true);
+  board->setBid(HelpUtils::uuid());
+  board->setTitle("第一个白板");
+
+  board->setCreated(QDateTime::currentDateTime());
+  board->setUpdated(QDateTime::currentDateTime());
+
+  QString task1 = "第一个任务";
+  board->appendNewItem(task1);
+
+  Strike* strike2 = new Strike();
+  strike2->setSid(HelpUtils::uuid());
+  strike2->setDesc("已经完成的任务");
+  strike2->setStatus(Strike::Done);
+  strike2->setCreated(QDateTime::currentDateTime());
+  strike2->setUpdated(QDateTime::currentDateTime());
+
+  board->appendItem(strike2);
+
+  Strike* strike3 = new Strike();
+  strike3->setSid(HelpUtils::uuid());
+  strike3->setDesc("进行中的任务");
+  strike3->setStatus(Strike::Working);
+  strike3->setCreated(QDateTime::currentDateTime());
+  strike3->setUpdated(QDateTime::currentDateTime());
+
+  board->appendItem(strike3);
+
+  QList<Board *> * list = new QList<Board *>();
+  list->append(board);
+
+  return list;
 }
 
 //获取数据文件路径

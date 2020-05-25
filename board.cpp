@@ -43,19 +43,15 @@ int Board::size() const {
 }
 
 void Board::appendNewItem(QString &desc) {
-        Strike strike;
+        Strike* strike = new Strike();
 
-        //uuid
-        QUuid id = QUuid::createUuid();
-        QString strId = id.toString();
+        strike->setSid(HelpUtils::uuid());
+        strike->setDesc(desc);
+        strike->setStatus(Strike::NewAdd);
+        strike->setCreated(QDateTime::currentDateTime());
+        strike->setUpdated(QDateTime::currentDateTime());
 
-        strike.setSid(strId);
-        strike.setDesc(desc);
-        strike.setStatus(Strike::NewAdd);
-        strike.setCreated(QDateTime::currentDateTime());
-        strike.setUpdated(QDateTime::currentDateTime());
-
-        mItems->append(&strike);
+        mItems->append(strike);
 }
 
 void Board::insertNewItem(int index, QString &desc) {

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <strike.h>
+#include "helputils.h"
 
 class Board  {
   //Q_OBJECT
