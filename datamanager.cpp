@@ -137,7 +137,7 @@ void DataManager::archivedStrike(QString bid, Strike &strike) {
 
 
 
-QList<Board*>* DataManager::readAllBoards() {
+QList<Board*>* DataManager::readAllData() {
         QJsonDocument doc = readDataFromFile();
 
         //parse json
@@ -185,6 +185,16 @@ QList<Board*>* DataManager::readAllBoards() {
                 m_archivedBoards = archivedBoardList; //
         }
 
+        //读取其他数据
+        if(json.contains("general")){
+          QJsonObject generalObj = json["general"].toObject();
+          if(generalObj.contains("lastBackup")){
+            m_dataHolder->setLastBackupTime(QDateTime::fromString(generalObj["lastBackup"].toString()));
+          }
+          if(generalObj.contains("lastUpdate")){
+            m_dataHolder->setLastUpdateTime(QDateTime::fromString(generalObj["lastUpdate"].toString()));
+          }
+        }
 
         return m_boards;
 }
@@ -442,15 +452,22 @@ QJsonObject DataManager::transferBoardToJson(Board* board, bool archived) {
         return boardObj;
 }
 
+DataHolder *DataManager::dataHolder() const
+{
+  return m_dataHolder;
+}
+
 void DataManager::doSaveData() {
         doSaveCounter++;
-
 
         //save data
         qDebug("hello start to save data......%d ", doSaveCounter);
 
         //for test
         //QThread::msleep(1000);
+
+        //最后更新时间
+        m_dataHolder->setLastUpdateTime(QDateTime::currentDateTime());
 
 
         QJsonObject saveObject;
@@ -484,6 +501,12 @@ void DataManager::doSaveData() {
 
         saveObject["archived_all"] = archivedAllArray;
 
+        //Todo 保存其他通用数据
+        QJsonObject generalObj;
+        generalObj["lastBackup"] = m_dataHolder->getLastBackupTime().toString("yyyy-MM-dd hh:mm:ss");
+        generalObj["lastUpdate"] = m_dataHolder->getLastUpdateTime().toString("yyyy-MM-dd hh:mm:ss");
+
+        saveObject["general"] = generalObj;
 
         //保存文件名
         QString pathName = pickDataFilePathName();

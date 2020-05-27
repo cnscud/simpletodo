@@ -2,6 +2,7 @@
 #define DATAMANAGER_H
 
 #include "board.h"
+#include "dataholder.h"
 #include "helputils.h"
 
 #include <QModelIndex>
@@ -35,7 +36,7 @@ class DataManager : public QObject
   void archivedStrike(QString bid, Strike &strike);
 
   //读取所有数据
-  QList<Board*> *readAllBoards();
+  QList<Board*> *readAllData();
 
 
   //保存数据
@@ -43,12 +44,15 @@ class DataManager : public QObject
   void fireSaveData();
 
 
+  DataHolder *dataHolder() const;
+
 protected:
-   QJsonObject transferBoardToJson(Board* board, bool archived);
+  QJsonObject transferBoardToJson(Board* board, bool archived);
 
 private:
   QList<Board*> *m_boards = new QList<Board*>();
   QList<Board*> *m_archivedBoards = new QList<Board*>(); //归档的任务: 按原Board分类, 一一对应
+  DataHolder* m_dataHolder = new DataHolder(); //其他数据, 统一管理
 
   QString pickDataFilePathName();
   QJsonDocument readDataFromFile();

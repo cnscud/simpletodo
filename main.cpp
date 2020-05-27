@@ -11,6 +11,7 @@
 #include <QQmlContext>
 #include <QSharedMemory>
 #include <QSystemSemaphore>
+#include <QTranslator>
 
 
 int main(int argc, char *argv[]) {
@@ -64,6 +65,12 @@ int main(int argc, char *argv[]) {
 
         //单例检测结束================================================================
 
+        //装载中文语言
+        QTranslator tran;
+        if( tran.load("qt_zh_CN.qm", ":/")) { //相对路径.
+          qDebug("tran load ok ");
+          QApplication::installTranslator(&tran);
+        }
 
 
         DataManager dataMan;
@@ -75,7 +82,7 @@ int main(int argc, char *argv[]) {
         //BoardWindowListModel* bwlm = mock->mockData();
 
         //从文件读取
-        QList<Board*> *boards = dataMan.readAllBoards();
+        QList<Board*> *boards = dataMan.readAllData();
 
 
         BoardWindowListModel* bwlm = new BoardWindowListModel();

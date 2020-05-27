@@ -13,5 +13,6 @@
         <file>qtquickcontrols2.conf</file>
         <file>MainSection.qml</file>
         <file>CoodMenu.qml</file>
+        <file>qt_zh_CN.qm</file>
     </qresource>
 </RCC>

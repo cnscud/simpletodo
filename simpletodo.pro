@@ -19,6 +19,7 @@ SOURCES += \
         board.cpp \
         boardmodelproxy.cpp \
         boardwindowlistmodel.cpp \
+        dataholder.cpp \
         datamanager.cpp \
         helputils.cpp \
         main.cpp \
@@ -41,6 +42,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     README.md \
+    qt_zh_CN.qm \
     template.json
 
 HEADERS += \
@@ -48,6 +50,7 @@ HEADERS += \
     boardmodelproxy.h \
     boardwindowlistmodel.h \
     consts.h \
+    dataholder.h \
     datamanager.h \
     helputils.h \
     mockhelper.h \

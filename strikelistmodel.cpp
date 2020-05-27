@@ -45,6 +45,7 @@ bool StrikeListModel::setData(const QModelIndex &index, const QVariant &value, i
 
                 //总是更新最新更新时间
                 strike->setUpdated(QDateTime::currentDateTime());
+                board->setUpdated(QDateTime::currentDateTime());
 
                 switch(role) {
                         case SidRole:
