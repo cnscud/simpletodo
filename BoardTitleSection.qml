@@ -234,6 +234,7 @@ Rectangle {
 
             color: "blue"
             font.bold: true
+            cursorVisible: true
 
             //底部留点空间
             bottomPadding: 5

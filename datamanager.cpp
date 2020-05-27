@@ -1,4 +1,5 @@
 #include "datamanager.h"
+#include "consts.h"
 
 #include <QDir>
 #include <QFuture>
@@ -12,6 +13,10 @@
 
 DataManager::DataManager() {
 
+  QTimer* timer = new QTimer();
+  connect(timer, &QTimer::timeout, this, &DataManager::timerFireBackupData);
+  timer->setInterval(1000 * 60 * 5); //5分钟
+  timer->start();
 }
 
 void DataManager::windowModelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
@@ -186,15 +191,20 @@ QList<Board*>* DataManager::readAllData() {
         }
 
         //读取其他数据
-        if(json.contains("general")){
-          QJsonObject generalObj = json["general"].toObject();
-          if(generalObj.contains("lastBackup")){
-            m_dataHolder->setLastBackupTime(QDateTime::fromString(generalObj["lastBackup"].toString()));
-          }
-          if(generalObj.contains("lastUpdate")){
-            m_dataHolder->setLastUpdateTime(QDateTime::fromString(generalObj["lastUpdate"].toString()));
-          }
+        if(json.contains("general")) {
+                QJsonObject generalObj = json["general"].toObject();
+                if(generalObj.contains("lastBackup") && generalObj["lastBackup"].toString() != "") {
+                        m_dataHolder->setLastBackupTime(QDateTime::fromString(generalObj["lastBackup"].toString(), DateTimeFormat));
+                }
+                if(generalObj.contains("lastUpdate")) {
+                        m_dataHolder->setLastUpdateTime(QDateTime::fromString(generalObj["lastUpdate"].toString(), DateTimeFormat));
+                }
         }
+
+
+        //fire check to backup data
+        fireBackupData();
+
 
         return m_boards;
 }
@@ -240,8 +250,8 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr, bool archive
                 board->setWindowHeight(oneSection["windowHeight"].toInt());
         }
 
-        board->setCreated(QDateTime::fromString(oneSection["created"].toString()));
-        board->setUpdated(QDateTime::fromString(oneSection["updated"].toString()));
+        board->setCreated(QDateTime::fromString(oneSection["created"].toString(), DateTimeFormat));
+        board->setUpdated(QDateTime::fromString(oneSection["updated"].toString(), DateTimeFormat));
 
         //parse Strike list
         if(oneSection.contains("items") && oneSection["items"].isArray()) {
@@ -262,8 +272,8 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr, bool archive
                                 strike->setTextColor(item["textColor"].toString());
                         }
                         strike->setFontStyle(item["fontStyle"].toString());
-                        strike->setCreated(QDateTime::fromString(item["created"].toString()));
-                        strike->setUpdated(QDateTime::fromString(item["updated"].toString()));
+                        strike->setCreated(QDateTime::fromString(item["created"].toString(), DateTimeFormat));
+                        strike->setUpdated(QDateTime::fromString(item["updated"].toString(), DateTimeFormat));
 
 
                         items->append(strike);
@@ -312,7 +322,7 @@ QList<Board *> *DataManager::prepareDefaultBoard() {
 }
 
 //获取数据文件路径
-QString DataManager::pickDataFilePathName() {
+QString DataManager::pickDataFilePathName(bool appendDate) {
 
         //debug
         //qDebug("hello %s", qPrintable(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)));
@@ -325,6 +335,10 @@ QString DataManager::pickDataFilePathName() {
                 if(!dir.mkdir(pathRoot)) {
                         qWarning("创建目录失败 %s", qPrintable(pathRoot));
                 }
+        }
+
+        if(appendDate) {
+                return pathRoot + dataFileName + "." + QDate::currentDate().toString("yyyy-MM-dd");
         }
 
         return pathRoot + dataFileName;
@@ -357,6 +371,49 @@ QJsonDocument DataManager::readDataFromFile() {
 }
 
 
+void DataManager::fireBackupData() {
+
+        qDebug("fire backup data ...start");
+
+        //条件  1. 数据最后更新时间 > 最后备份时间  2. 最后备份时间 >1天
+        if(m_dataHolder->getLastUpdateTime() <= m_dataHolder->getLastBackupTime()) {
+                return;
+        }
+
+        QDateTime last24Hours = QDateTime::currentDateTime().addDays(-1);
+        if(m_dataHolder->getLastBackupTime() > last24Hours) {
+                return;
+        }
+
+        //新线程运行
+        QFuture<void> future = QtConcurrent::run([ = ]() {
+                doBackupData();
+        });
+
+        qDebug("fire backup data ...end");
+
+}
+
+void DataManager::doBackupData() {
+        //备份当前数据
+        doSaveData(pickDataFilePathName(true), true);
+
+        //Todo 检查是否删除过多的备份文件: 保留1-7天, 每月1号
+
+}
+
+void DataManager::timerFireBackupData()
+{
+  QTime now = QTime::currentTime();
+
+  qDebug("timer for check backup data ....... %s", qPrintable(now.toString()));
+
+  //检查时间: 是否在9点0分 -> 9点5分之间
+  if (now.hour() ==21 && now.minute()>=0 && now.minute()<5) {
+    qInfo("fire backup data by timer .... %s " , qPrintable(now.toString()));
+    fireBackupData();
+  }
+}
 
 
 void DataManager::fireSaveData() {
@@ -374,9 +431,8 @@ void DataManager::fireSaveData() {
         qDebug("before to call doSave......");
 
         //新线程运行
-        QFuture<void> future = QtConcurrent::run([=]() {
-          // Code in this block will run in another thread
-          syncCallSaveData();
+        QFuture<void> future = QtConcurrent::run([ = ]() {
+                syncCallSaveData();
         });
 
         qDebug("after call doSave......");
@@ -385,26 +441,27 @@ void DataManager::fireSaveData() {
         qDebug("fired save data ============= end %d ", fireSaveCounter);
 }
 
+
 //此函数在独立线程里运行
 void DataManager::syncCallSaveData() {
-    //加锁: 如果已经有保存在进行, 则等待解锁: 只会有一个在等待
-    mutexSaveData.lock();
+        //加锁: 如果已经有保存在进行, 则等待解锁: 只会有一个在等待
+        mutexSaveData.lock();
 
-    //如果两个调用同时到达, 第二个等待获取锁进入之后: 二次检查
-    if(!needMoreSave) {
-      mutexSaveData.unlock();
-      return;
-    }
+        //如果两个调用同时到达, 第二个等待获取锁进入之后: 二次检查
+        if(!needMoreSave) {
+                mutexSaveData.unlock();
+                return;
+        }
 
-    savingData = true;
-    needMoreSave = false;
+        savingData = true;
+        needMoreSave = false;
 
-    //!!! 修改的过程中 会产生脏数据 FIXME 是否需要clone数据?
-    doSaveData();
-    savingData = false;
+        //!!! 修改的过程中 会产生脏数据 FIXME 是否需要clone数据?
+        doSaveData(pickDataFilePathName(false));
+        savingData = false;
 
-    //解锁
-    mutexSaveData.unlock();
+        //解锁
+        mutexSaveData.unlock();
 }
 
 
@@ -425,8 +482,8 @@ QJsonObject DataManager::transferBoardToJson(Board* board, bool archived) {
                 boardObj["windowHeight"] = board->getWindowHeight();
         }
 
-        boardObj["created"] = board->getCreated().toString("yyyy-MM-dd hh:mm:ss");
-        boardObj["updated"] = board->getUpdated().toString("yyyy-MM-dd hh:mm:ss");
+        boardObj["created"] = board->getCreated().toString(DateTimeFormat);
+        boardObj["updated"] = board->getUpdated().toString(DateTimeFormat);
 
 
         QJsonArray boardItemsArray;
@@ -441,8 +498,8 @@ QJsonObject DataManager::transferBoardToJson(Board* board, bool archived) {
                 itemObj["textColor"] = item->getTextColor();
                 itemObj["fontStyle"] = item->getFontStyle();
 
-                itemObj["created"] = item->getCreated().toString("yyyy-MM-dd hh:mm:ss");
-                itemObj["updated"] = item->getUpdated().toString("yyyy-MM-dd hh:mm:ss");
+                itemObj["created"] = item->getCreated().toString(DateTimeFormat);
+                itemObj["updated"] = item->getUpdated().toString(DateTimeFormat);
 
                 boardItemsArray.append(itemObj);
         }
@@ -452,22 +509,23 @@ QJsonObject DataManager::transferBoardToJson(Board* board, bool archived) {
         return boardObj;
 }
 
-DataHolder *DataManager::dataHolder() const
-{
-  return m_dataHolder;
+DataHolder *DataManager::dataHolder() const {
+        return m_dataHolder;
 }
 
-void DataManager::doSaveData() {
+void DataManager::doSaveData(QString filename, bool backup) {
         doSaveCounter++;
 
         //save data
-        qDebug("hello start to save data......%d ", doSaveCounter);
+        qDebug("hello start to save data......%d  %s" , doSaveCounter, (backup? " for backup ": ""));
 
         //for test
         //QThread::msleep(1000);
 
         //最后更新时间
-        m_dataHolder->setLastUpdateTime(QDateTime::currentDateTime());
+        if(!backup) {
+                m_dataHolder->setLastUpdateTime(QDateTime::currentDateTime());
+        }
 
 
         QJsonObject saveObject;
@@ -501,19 +559,21 @@ void DataManager::doSaveData() {
 
         saveObject["archived_all"] = archivedAllArray;
 
-        //Todo 保存其他通用数据
+        //保存其他通用数据
         QJsonObject generalObj;
-        generalObj["lastBackup"] = m_dataHolder->getLastBackupTime().toString("yyyy-MM-dd hh:mm:ss");
-        generalObj["lastUpdate"] = m_dataHolder->getLastUpdateTime().toString("yyyy-MM-dd hh:mm:ss");
+        generalObj["lastBackup"] = m_dataHolder->getLastBackupTime().toString(DateTimeFormat);
+        generalObj["lastUpdate"] = m_dataHolder->getLastUpdateTime().toString(DateTimeFormat);
 
         saveObject["general"] = generalObj;
 
         //保存文件名
-        QString pathName = pickDataFilePathName();
+        if(filename == nullptr) {
+                filename = pickDataFilePathName();
+        }
 
-        QSaveFile file(pathName);
+        QSaveFile file(filename);
         if(!file.open(QIODevice::WriteOnly)) {
-                qWarning("Couldn't open save file %s", qPrintable(pathName));
+                qWarning("Couldn't open save file %s", qPrintable(filename));
                 return;
         }
 
@@ -523,7 +583,7 @@ void DataManager::doSaveData() {
         //真正保存到实际文件
         file.commit();
 
-        qDebug("hello end to save data......%d. ", doSaveCounter);
+        qDebug("hello end to save data......%d  %s" , doSaveCounter, (backup? " for backup ": ""));
 }
 
 

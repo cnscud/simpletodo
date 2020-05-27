@@ -324,6 +324,7 @@ Rectangle {
                         
                         //focus: true
                         selectByMouse: true
+
                         
                         //Debug: 不变不会进入的, 例如已经focus, 再次设置不会触发此事件
                         onFocusChanged: {

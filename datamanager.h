@@ -40,11 +40,18 @@ class DataManager : public QObject
 
 
   //保存数据
-  void doSaveData();
+  void doSaveData(QString filename = nullptr, bool backup = false);
   void fireSaveData();
+  //检查->备份数据
+  void fireBackupData();
+  void doBackupData();
+
 
 
   DataHolder *dataHolder() const;
+
+ public slots:
+  void timerFireBackupData();
 
 protected:
   QJsonObject transferBoardToJson(Board* board, bool archived);
@@ -54,7 +61,7 @@ private:
   QList<Board*> *m_archivedBoards = new QList<Board*>(); //归档的任务: 按原Board分类, 一一对应
   DataHolder* m_dataHolder = new DataHolder(); //其他数据, 统一管理
 
-  QString pickDataFilePathName();
+  QString pickDataFilePathName(bool appendDate = false);
   QJsonDocument readDataFromFile();
   Board* parseOneBoard(QJsonObject &json, QString &abbr, bool archived);
 
