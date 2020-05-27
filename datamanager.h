@@ -9,6 +9,7 @@
 #include <QList>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRegularExpression>
 
 class DataManager : public QObject
 {
@@ -16,6 +17,7 @@ class DataManager : public QObject
   DataManager();
   const QString dataFileName = "simpletodo.json"; //文件名
   const QString archived_prefix = "archived_";
+  //const QRegularExpression re("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)$");
 
 
   //白板列表模型数据变化

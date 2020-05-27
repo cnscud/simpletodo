@@ -13,10 +13,10 @@
 
 DataManager::DataManager() {
 
-  QTimer* timer = new QTimer();
-  connect(timer, &QTimer::timeout, this, &DataManager::timerFireBackupData);
-  timer->setInterval(1000 * 60 * 5); //5分钟
-  timer->start();
+        QTimer* timer = new QTimer();
+        connect(timer, &QTimer::timeout, this, &DataManager::timerFireBackupData);
+        timer->setInterval(1000 * 60 * 5); //5分钟
+        timer->start();
 }
 
 void DataManager::windowModelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
@@ -394,25 +394,49 @@ void DataManager::fireBackupData() {
 
 }
 
+QRegularExpression dateReg("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)$");
+
 void DataManager::doBackupData() {
         //备份当前数据
         doSaveData(pickDataFilePathName(true), true);
 
-        //Todo 检查是否删除过多的备份文件: 保留1-7天, 每月1号
+        //检查是否删除过多的备份文件: 保留1-7天, 每月1号?
+        QString pathRoot = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)  + "/";
+        QDir dir(pathRoot);
+        QFileInfoList list = dir.entryInfoList();
+        for(int i = 0; i < list.size(); ++i) {
+                QFileInfo fileInfo = list.at(i);
+                if(fileInfo.isDir()) {
+                        continue;
+                }
 
+                QString filename = fileInfo.fileName();
+                if(filename.startsWith(dataFileName + ".")) {
+                        QString datePart = filename.mid(dataFileName.length() +1);
+
+                        QRegularExpressionMatch match = dateReg.match(datePart);
+                        if(match.hasMatch()) {
+                                QDate fileDate = QDate::fromString(datePart, DateFormat);
+                                if(QDate::currentDate().addDays(-7) > fileDate) {
+                                        //delete file
+                                        QFile file(fileInfo.absoluteFilePath());
+                                        file.remove();
+                                }
+                        }
+                }
+        }
 }
 
-void DataManager::timerFireBackupData()
-{
-  QTime now = QTime::currentTime();
+void DataManager::timerFireBackupData() {
+        QTime now = QTime::currentTime();
 
-  qDebug("timer for check backup data ....... %s", qPrintable(now.toString()));
+        qDebug("timer for check backup data ....... %s", qPrintable(now.toString()));
 
-  //检查时间: 是否在9点0分 -> 9点5分之间
-  if (now.hour() ==21 && now.minute()>=0 && now.minute()<5) {
-    qInfo("fire backup data by timer .... %s " , qPrintable(now.toString()));
-    fireBackupData();
-  }
+        //检查时间: 是否在9点0分 -> 9点5分之间
+        if(now.hour() == 21 && now.minute() >= 0 && now.minute() < 5) {
+                qInfo("fire backup data by timer .... %s ", qPrintable(now.toString()));
+                fireBackupData();
+        }
 }
 
 
@@ -517,7 +541,7 @@ void DataManager::doSaveData(QString filename, bool backup) {
         doSaveCounter++;
 
         //save data
-        qDebug("hello start to save data......%d  %s" , doSaveCounter, (backup? " for backup ": ""));
+        qDebug("hello start to save data......%d  %s", doSaveCounter, (backup ? " for backup " : ""));
 
         //for test
         //QThread::msleep(1000);
@@ -583,7 +607,7 @@ void DataManager::doSaveData(QString filename, bool backup) {
         //真正保存到实际文件
         file.commit();
 
-        qDebug("hello end to save data......%d  %s" , doSaveCounter, (backup? " for backup ": ""));
+        qDebug("hello end to save data......%d  %s", doSaveCounter, (backup ? " for backup " : ""));
 }
 
 

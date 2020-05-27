@@ -11,6 +11,7 @@
 */
 
 const QString DateTimeFormat  = "yyyy-MM-dd hh:mm:ss";
+const QString DateFormat  = "yyyy-MM-dd";
 
 
 //Q_ENUM(StrikeStatus)
