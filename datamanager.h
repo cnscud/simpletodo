@@ -56,6 +56,16 @@ private:
 
   QList<Board*> *prepareDefaultBoard();
 
+  //==================
+  bool savingData = false; //是否正在保存数据
+  bool needMoreSave = false; //是否需要保存数据
+  QMutex mutexSaveData; //同步锁
+  int doSaveCounter = 1000;
+  int fireSaveCounter = 1000;
+  //==================
+
+
+  void syncCallSaveData();
 };
 
 #endif // DATAMANAGER_H

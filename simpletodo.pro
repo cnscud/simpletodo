@@ -1,5 +1,6 @@
 QT += quick
 QT += widgets
+QT += concurrent
 
 CONFIG += c++11
 

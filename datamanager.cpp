@@ -1,11 +1,14 @@
 #include "datamanager.h"
 
 #include <QDir>
+#include <QFuture>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSaveFile>
 #include <QStandardPaths>
+#include <QThread>
+#include <QtConcurrent>
 
 DataManager::DataManager() {
 
@@ -126,7 +129,7 @@ void DataManager::archivedStrike(QString bid, Strike &strike) {
 
         qDebug("end catch archived Strike signal");
 
-        //存储 Todo ? 需要吗
+        //存储 Todo ? 需要吗: 因为归档时会移除当前行, 会触发fireSaveData, 所以目前此处没有调用
         //fireSaveData();
 
         qDebug("fire archived Strike signal --> save data");
@@ -158,28 +161,28 @@ QList<Board*>* DataManager::readAllBoards() {
         }
 
         //没数据: 默认数据
-        if(m_boards == nullptr || m_boards->size() <=0) {
-          m_boards = prepareDefaultBoard();
+        if(m_boards == nullptr || m_boards->size() <= 0) {
+                m_boards = prepareDefaultBoard();
         }
 
         //todo 读取归档数据
         //m_archivedBoards  = new QList<Board*>();
 
         if(json.contains("archived_all") && json["archived_all"].isArray()) {
-          QJsonArray archivedAllArray = json["archived_all"].toArray();
+                QJsonArray archivedAllArray = json["archived_all"].toArray();
 
-          QList<Board*> *archivedBoardList = new QList<Board*>();
+                QList<Board*> *archivedBoardList = new QList<Board*>();
 
-          for(int n = 0; n < archivedAllArray.size(); ++n) {
-            QString listName = archivedAllArray[n].toString();
+                for(int n = 0; n < archivedAllArray.size(); ++n) {
+                        QString listName = archivedAllArray[n].toString();
 
-            //读一个任务列表
-            Board* oneList = parseOneBoard(json, listName, true);
+                        //读一个任务列表
+                        Board* oneList = parseOneBoard(json, listName, true);
 
-            archivedBoardList->append(oneList);
-          }
+                        archivedBoardList->append(oneList);
+                }
 
-          m_archivedBoards = archivedBoardList; //
+                m_archivedBoards = archivedBoardList; //
         }
 
 
@@ -205,26 +208,26 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr, bool archive
         board->setTitle(title);
 
         if(!archived) {
-            board->setHidden(oneSection["hidden"].toBool());
+                board->setHidden(oneSection["hidden"].toBool());
 
-            if(oneSection.contains("backColor")) {
-                    board->setBackColor(oneSection["backColor"].toString());
-            }
+                if(oneSection.contains("backColor")) {
+                        board->setBackColor(oneSection["backColor"].toString());
+                }
 
-            if(oneSection.contains("fontSize")) {
-                    board->setFontSize(oneSection["fontSize"].toInt());
-            }
+                if(oneSection.contains("fontSize")) {
+                        board->setFontSize(oneSection["fontSize"].toInt());
+                }
 
-            if(oneSection.contains("fontFamily")) {
-                    board->setFontFamily(oneSection["fontFamily"].toString());
-            }
+                if(oneSection.contains("fontFamily")) {
+                        board->setFontFamily(oneSection["fontFamily"].toString());
+                }
 
-            board->setHiddenArchived(oneSection["hiddenArchived"].toBool());
+                board->setHiddenArchived(oneSection["hiddenArchived"].toBool());
 
-            board->setWindowX(oneSection["windowX"].toInt());
-            board->setWindowY(oneSection["windowY"].toInt());
-            board->setWindowWidth(oneSection["windowWidth"].toInt());
-            board->setWindowHeight(oneSection["windowHeight"].toInt());
+                board->setWindowX(oneSection["windowX"].toInt());
+                board->setWindowY(oneSection["windowY"].toInt());
+                board->setWindowWidth(oneSection["windowWidth"].toInt());
+                board->setWindowHeight(oneSection["windowHeight"].toInt());
         }
 
         board->setCreated(QDateTime::fromString(oneSection["created"].toString()));
@@ -263,40 +266,39 @@ Board* DataManager::parseOneBoard(QJsonObject &json, QString &abbr, bool archive
         return board;
 }
 
-QList<Board *> *DataManager::prepareDefaultBoard()
-{
-  Board* board = new Board(true);
-  board->setBid(HelpUtils::uuid());
-  board->setTitle("第一个白板");
+QList<Board *> *DataManager::prepareDefaultBoard() {
+        Board* board = new Board(true);
+        board->setBid(HelpUtils::uuid());
+        board->setTitle("第一个白板");
 
-  board->setCreated(QDateTime::currentDateTime());
-  board->setUpdated(QDateTime::currentDateTime());
+        board->setCreated(QDateTime::currentDateTime());
+        board->setUpdated(QDateTime::currentDateTime());
 
-  QString task1 = "第一个任务";
-  board->appendNewItem(task1);
+        QString task1 = "第一个任务";
+        board->appendNewItem(task1);
 
-  Strike* strike2 = new Strike();
-  strike2->setSid(HelpUtils::uuid());
-  strike2->setDesc("已经完成的任务");
-  strike2->setStatus(Strike::Done);
-  strike2->setCreated(QDateTime::currentDateTime());
-  strike2->setUpdated(QDateTime::currentDateTime());
+        Strike* strike2 = new Strike();
+        strike2->setSid(HelpUtils::uuid());
+        strike2->setDesc("已经完成的任务");
+        strike2->setStatus(Strike::Done);
+        strike2->setCreated(QDateTime::currentDateTime());
+        strike2->setUpdated(QDateTime::currentDateTime());
 
-  board->appendItem(strike2);
+        board->appendItem(strike2);
 
-  Strike* strike3 = new Strike();
-  strike3->setSid(HelpUtils::uuid());
-  strike3->setDesc("进行中的任务");
-  strike3->setStatus(Strike::Working);
-  strike3->setCreated(QDateTime::currentDateTime());
-  strike3->setUpdated(QDateTime::currentDateTime());
+        Strike* strike3 = new Strike();
+        strike3->setSid(HelpUtils::uuid());
+        strike3->setDesc("进行中的任务");
+        strike3->setStatus(Strike::Working);
+        strike3->setCreated(QDateTime::currentDateTime());
+        strike3->setUpdated(QDateTime::currentDateTime());
 
-  board->appendItem(strike3);
+        board->appendItem(strike3);
 
-  QList<Board *> * list = new QList<Board *>();
-  list->append(board);
+        QList<Board *> * list = new QList<Board *>();
+        list->append(board);
 
-  return list;
+        return list;
 }
 
 //获取数据文件路径
@@ -346,15 +348,54 @@ QJsonDocument DataManager::readDataFromFile() {
 
 
 
+
 void DataManager::fireSaveData() {
-        qDebug("fired save data ============= start");
+        fireSaveCounter++;
 
-        //really save
-        doSaveData();
+        qDebug("fired save data ============= start %d", fireSaveCounter);
 
-        qDebug("fired save data ============= end  ");
+
+        if(needMoreSave) {
+                return;
+        } else {
+                needMoreSave = true;
+        }
+
+        qDebug("before to call doSave......");
+
+        //新线程运行
+        QFuture<void> future = QtConcurrent::run([=]() {
+          // Code in this block will run in another thread
+          syncCallSaveData();
+        });
+
+        qDebug("after call doSave......");
+
+
+        qDebug("fired save data ============= end %d ", fireSaveCounter);
 }
 
+//此函数在独立线程里运行
+void DataManager::syncCallSaveData() {
+    //加锁: 如果已经有保存在进行, 则等待解锁: 只会有一个在等待
+    mutexSaveData.lock();
+
+    //如果两个调用同时到达, 第二个等待获取锁进入之后: 二次检查
+    if(!needMoreSave) {
+      mutexSaveData.unlock();
+      return;
+    }
+
+    savingData = true;
+    needMoreSave = false;
+
+    //!!! 修改的过程中 会产生脏数据 FIXME 是否需要clone数据?
+    doSaveData();
+    savingData = false;
+
+    //解锁
+    mutexSaveData.unlock();
+}
 
 
 QJsonObject DataManager::transferBoardToJson(Board* board, bool archived) {
@@ -402,8 +443,15 @@ QJsonObject DataManager::transferBoardToJson(Board* board, bool archived) {
 }
 
 void DataManager::doSaveData() {
+        doSaveCounter++;
+
+
         //save data
-        qDebug("hello start to save data......");
+        qDebug("hello start to save data......%d ", doSaveCounter);
+
+        //for test
+        //QThread::msleep(1000);
+
 
         QJsonObject saveObject;
 
@@ -452,8 +500,7 @@ void DataManager::doSaveData() {
         //真正保存到实际文件
         file.commit();
 
-        qDebug("hello end to save data......");
-
+        qDebug("hello end to save data......%d. ", doSaveCounter);
 }
 
 
