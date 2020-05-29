@@ -82,15 +82,6 @@ Rectangle {
           //编辑状态则不需要右键菜单
           enabled: !titleEditMode
 
-          Action { text: "删除此白板"
-              onTriggered: {
-                  //属性绑定, 不关闭会crash...
-                  titleContextMenu.close();
-                  //询问对话框
-                  deleteConfirmDialog.open();
-              }
-          }
-
           Action { text: "背景色..."
               onTriggered: {
                   backColorDialog.open();
@@ -137,6 +128,23 @@ Rectangle {
               }
 
           }
+
+          Action { text: "删除此白板"
+              onTriggered: {
+                  //属性绑定, 不关闭会crash...
+                  titleContextMenu.close();
+                  //询问对话框
+                  deleteConfirmDialog.open();
+              }
+          }
+
+          Action { text: "查看归档数据"
+              onTriggered: {
+                  //通知->打开查看归档窗口
+                  windowModel.viewArchivedStrikes(index);
+              }
+          }
+
 
     }
 

@@ -1,23 +1,29 @@
 #include "strike.h"
+#include <QtDebug>
 
 Strike::Strike()
 {
 
 }
 
-//clone
 Strike::Strike(const Strike &s2)
 {
-  sid = s2.sid;
-  desc = s2.desc;
-  status = s2.status;
-  textColor = s2.textColor;
-  fontStyle = s2.fontStyle;
-  created = s2.created;
-  updated = s2.updated;
+  this->sid = s2.sid;
+  this->desc = s2.desc;
+  this->status = s2.status;
+  this->textColor = s2.textColor;
+  this->fontStyle = s2.fontStyle;
+  this->created = s2.created;
+  this->updated = s2.updated;
 }
 
-/*
+
+Strike::~Strike()
+{
+  qDebug() << "destructor strike  " << sid << "," << desc << ", " <<this;
+}
+
+
 void Strike::cloneStrike(Strike *s2)
 {
   sid = s2->getSid();
@@ -27,7 +33,7 @@ void Strike::cloneStrike(Strike *s2)
   fontStyle = s2->getFontStyle();
   created = s2->getCreated();
   updated = s2->getUpdated();
-}*/
+}
 
 QString Strike::getSid() const
 {

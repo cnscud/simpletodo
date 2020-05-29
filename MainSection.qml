@@ -148,12 +148,6 @@ Rectangle {
                                 model.status = 2;
                             }
                         }
-                        Action { text: "已归档"
-                            onTriggered: {
-                                //Todo 归档就是打个标记: 但是如何隐藏哪
-
-                            }
-                        }
                   }
 
                   MenuSeparator { }

@@ -5,13 +5,15 @@
 #include <QDateTime>
 #include "consts.h"
 
-class Strike  {
+class Strike {
   //Q_OBJECT
 
 public:
   Strike();
   Strike(const Strike &s2);
-  //void cloneStrike(Strike* strike);
+  void cloneStrike(Strike* strike);
+
+  ~Strike();
 
   //任务完成状态
   enum StrikeStatus

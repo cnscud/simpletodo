@@ -3,6 +3,7 @@
 #include "boardwindowlistmodel.h"
 #include "datamanager.h"
 #include "mockhelper.h"
+#include "archivedcontroller.h"
 
 #include <QApplication>
 #include <QGuiApplication>
@@ -74,6 +75,7 @@ int main(int argc, char *argv[]) {
 
 
         DataManager dataMan;
+        ArchivedController archivedController;
 
         //start data ============================================
 
@@ -87,6 +89,8 @@ int main(int argc, char *argv[]) {
 
         BoardWindowListModel* bwlm = new BoardWindowListModel();
         bwlm->setBoardsAndProxy(boards);
+
+        archivedController.setDataManager(&dataMan);
 
 
         //end data  ============================================
@@ -133,7 +137,11 @@ int main(int argc, char *argv[]) {
 
         }
 
+        //归档窗口事件
+        QObject::connect(bwlm, &BoardWindowListModel::userWillViewArchivedStrikes, &archivedController, &ArchivedController::viewArchivedStrikes);
 
+
+        //主现场
         engine.load(url);
 
         return app.exec();

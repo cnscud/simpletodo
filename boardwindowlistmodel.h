@@ -53,6 +53,7 @@ class BoardWindowListModel : public QAbstractListModel
   //新增一个白板
   Q_INVOKABLE bool addBoard();
   Q_INVOKABLE bool removeBoard(int index);
+  Q_INVOKABLE void viewArchivedStrikes(int index);
 
 
   QList<BoardModelProxy *> *boardModelProxys() const;
@@ -62,6 +63,10 @@ class BoardWindowListModel : public QAbstractListModel
   //void setBoards(QList<Board *> *boards);
 
   void setBoardsAndProxy(QList<Board *> *boards);
+
+
+ signals:
+  void userWillViewArchivedStrikes(QString bid);
 
 private:
   QList<Board*> *m_boards;

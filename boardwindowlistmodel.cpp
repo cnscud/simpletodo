@@ -247,6 +247,14 @@ bool BoardWindowListModel::removeBoard(int index) {
         return true;
 }
 
+void BoardWindowListModel::viewArchivedStrikes(int index)
+{
+  Board* board  = m_boards->at(index);
+
+  //发出singal
+  emit userWillViewArchivedStrikes(board->getBid());
+}
+
 
 QList<BoardModelProxy *> *BoardWindowListModel::boardModelProxys() const {
         return m_boardModelProxys;

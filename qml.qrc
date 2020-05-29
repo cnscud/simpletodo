@@ -14,5 +14,6 @@
         <file>MainSection.qml</file>
         <file>CoodMenu.qml</file>
         <file>qt_zh_CN.qm</file>
+        <file>ArchivedBoardDialog.qml</file>
     </qresource>
 </RCC>

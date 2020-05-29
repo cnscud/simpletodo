@@ -13,10 +13,15 @@
 
 DataManager::DataManager() {
 
-        QTimer* timer = new QTimer();
-        connect(timer, &QTimer::timeout, this, &DataManager::timerFireBackupData);
-        timer->setInterval(1000 * 60 * 5); //5分钟
-        timer->start();
+      m_boards = new QList<Board*>();
+      m_archivedBoards = new QList<Board*>();
+      m_dataHolder = new DataHolder();
+
+      //备份定时器
+      QTimer* timer = new QTimer();
+      connect(timer, &QTimer::timeout, this, &DataManager::timerFireBackupData);
+      timer->setInterval(1000 * 60 * 5); //5分钟
+      timer->start();
 }
 
 void DataManager::windowModelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
@@ -82,8 +87,8 @@ void DataManager::strikeModelRowsRemoved(const QModelIndex &parent, int first, i
         fireSaveData();
 }
 
-void DataManager::archivedStrike(QString bid, Strike &strike) {
-        qDebug("catch a archived Strike singal: %s", qPrintable(strike.getSid()));
+void DataManager::archivedStrike(QString bid, Strike strike) {
+        qDebug() << "catch a archived Strike singal:  " << strike.getSid() << ": " << &strike;
 
 
         Board* destBoard = nullptr;
@@ -103,11 +108,13 @@ void DataManager::archivedStrike(QString bid, Strike &strike) {
                 return;
         }
 
-        Strike destStrike = strike;
+        //注意: 目前必须自己new & 赋值才可以,否则对象会被销毁!
+        Strike* destStrike = new Strike();
+        destStrike->cloneStrike(&strike);
 
         Board* destArchivedBoard = nullptr;
 
-        QString archived_bid = archived_prefix + bid;
+        QString archived_bid = Archived_prefix + bid;
 
         //查找Board, 如果不存在, 则创建一个
         for(int i = 0; i < m_archivedBoards->size(); ++i) {
@@ -130,14 +137,14 @@ void DataManager::archivedStrike(QString bid, Strike &strike) {
         destArchivedBoard->setUpdated(destBoard->getUpdated());
 
         //加入此归档的任务
-        destArchivedBoard->insertItem(&strike);
+        destArchivedBoard->insertItem(destStrike);
 
         qDebug("end catch archived Strike signal");
 
         //存储 Todo ? 需要吗: 因为归档时会移除当前行, 会触发fireSaveData, 所以目前此处没有调用
         //fireSaveData();
 
-        qDebug("fire archived Strike signal --> save data");
+        //qDebug("fire archived Strike signal --> save data");
 }
 
 
@@ -170,9 +177,7 @@ QList<Board*>* DataManager::readAllData() {
                 m_boards = prepareDefaultBoard();
         }
 
-        //todo 读取归档数据
-        //m_archivedBoards  = new QList<Board*>();
-
+        //读取归档数据
         if(json.contains("archived_all") && json["archived_all"].isArray()) {
                 QJsonArray archivedAllArray = json["archived_all"].toArray();
 
@@ -338,10 +343,10 @@ QString DataManager::pickDataFilePathName(bool appendDate) {
         }
 
         if(appendDate) {
-                return pathRoot + dataFileName + "." + QDate::currentDate().toString("yyyy-MM-dd");
+                return pathRoot + DataFileName + "." + QDate::currentDate().toString("yyyy-MM-dd");
         }
 
-        return pathRoot + dataFileName;
+        return pathRoot + DataFileName;
 }
 
 //读取Json文档
@@ -411,8 +416,8 @@ void DataManager::doBackupData() {
                 }
 
                 QString filename = fileInfo.fileName();
-                if(filename.startsWith(dataFileName + ".")) {
-                        QString datePart = filename.mid(dataFileName.length() +1);
+                if(filename.startsWith(DataFileName + ".")) {
+                        QString datePart = filename.mid(DataFileName.length() +1);
 
                         QRegularExpressionMatch match = dateReg.match(datePart);
                         if(match.hasMatch()) {
@@ -533,8 +538,18 @@ QJsonObject DataManager::transferBoardToJson(Board* board, bool archived) {
         return boardObj;
 }
 
+QList<Board *> *DataManager::boards() const
+{
+  return m_boards;
+}
+
+QList<Board *> *DataManager::archivedBoards() const
+{
+  return m_archivedBoards;
+}
+
 DataHolder *DataManager::dataHolder() const {
-        return m_dataHolder;
+  return m_dataHolder;
 }
 
 void DataManager::doSaveData(QString filename, bool backup) {

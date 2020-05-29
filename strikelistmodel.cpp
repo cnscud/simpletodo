@@ -2,7 +2,7 @@
 #include "helputils.h"
 
 StrikeListModel::StrikeListModel(QObject *parent)
-  : QAbstractListModel(parent) {
+        : QAbstractListModel(parent) {
 }
 
 int StrikeListModel::rowCount(const QModelIndex &parent) const {
@@ -41,7 +41,7 @@ QVariant StrikeListModel::data(const QModelIndex &index, int role) const {
 bool StrikeListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
 
         if(data(index, role) != value) {
-          Strike* strike = board->getItems()->at(index.row());
+                Strike* strike = board->getItems()->at(index.row());
 
                 //总是更新最新更新时间
                 strike->setUpdated(QDateTime::currentDateTime());
@@ -124,13 +124,15 @@ bool StrikeListModel::insertRows(int row, int count, const QModelIndex &parent) 
 
 bool StrikeListModel::removeRows(int row, int count, const QModelIndex &parent) {
         beginRemoveRows(parent, row, row + count - 1);
+        qDebug("begin remove Rows %d", row);
 
         for(int i = 0; i < count; ++i) {
-          //销毁对象
-          delete board->getItems()->at(row +i);
-          board->getItems()->removeAt(row + i);
+                //销毁对象
+                delete board->getItems()->at(row + i);
+                board->getItems()->removeAt(row + i);
         }
 
+        qDebug("end remove Rows %d", row);
         endRemoveRows();
         return true;
 }
@@ -147,11 +149,11 @@ bool StrikeListModel::moveRow(int sourceRow, int destRow) {
         //向下移动有问题 moveRow 需要加工
         //see https://forum.qt.io/topic/95879/endmoverows-in-model-crashes-my-app
         //see https://www.qtcentre.org/threads/43640-beginMoveRows-working-down-to-up-but-not-up-to-down-Any-insignt-would-be-great
-        if(sourceRow < destRow){
-          destRow++;
+        if(sourceRow < destRow) {
+                destRow++;
         }
-        if(destRow > rowCount()){
-          destRow = rowCount();
+        if(destRow > rowCount()) {
+                destRow = rowCount();
         }
 
 
@@ -189,33 +191,36 @@ bool StrikeListModel::removeStrike(int index) {
         return true;
 }
 
-bool StrikeListModel::archivedStrike(int index)
-{
-  Strike* strike = board->getItems()->at(index);
-  //clone object
-  Strike destStrike(*strike);
+bool StrikeListModel::archivedStrike(int index) {
+        qDebug("call archivedStrike %d", index);
 
-  //通知
-  emit strikeArchived(board->getBid(), destStrike);
+        Strike* strike = board->getItems()->at(index);
+        //clone object
+        //Strike destStrike(*strike);
+        //destStrike.setSid("archived_" + destStrike.getSid());
 
-  //移除
-  removeRows(index, 1, QModelIndex());
+        //通知
+        QString bid = board->getBid();
+        emit strikeArchived(bid, *strike);
 
-  return true;
+        //移除
+        removeRows(index, 1, QModelIndex());
+
+        qDebug("end call archivedStrike %d", index);
+
+        return true;
 }
 
 
-Board *StrikeListModel::getBoard() const
-{
-  return board;
+Board *StrikeListModel::getBoard() const {
+        return board;
 }
 
-void StrikeListModel::setBoard(Board *value)
-{
-  beginResetModel();
+void StrikeListModel::setBoard(Board *value) {
+        beginResetModel();
 
-  board = value;
+        board = value;
 
-  endResetModel();
+        endResetModel();
 
 }

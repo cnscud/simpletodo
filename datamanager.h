@@ -15,9 +15,6 @@ class DataManager : public QObject
 {
  public:
   DataManager();
-  const QString dataFileName = "simpletodo.json"; //文件名
-  const QString archived_prefix = "archived_";
-  //const QRegularExpression re("^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)$");
 
 
   //白板列表模型数据变化
@@ -35,7 +32,7 @@ class DataManager : public QObject
   void strikeModelRowsRemoved(const QModelIndex &parent, int first, int last);
 
   //归档数据
-  void archivedStrike(QString bid, Strike &strike);
+  void archivedStrike(QString bid, Strike strike);
 
   //读取所有数据
   QList<Board*> *readAllData();
@@ -52,16 +49,20 @@ class DataManager : public QObject
 
   DataHolder *dataHolder() const;
 
- public slots:
+  QList<Board *> *archivedBoards() const;
+
+  QList<Board *> *boards() const;
+
+public slots:
   void timerFireBackupData();
 
 protected:
   QJsonObject transferBoardToJson(Board* board, bool archived);
 
 private:
-  QList<Board*> *m_boards = new QList<Board*>();
-  QList<Board*> *m_archivedBoards = new QList<Board*>(); //归档的任务: 按原Board分类, 一一对应
-  DataHolder* m_dataHolder = new DataHolder(); //其他数据, 统一管理
+  QList<Board*> *m_boards;
+  QList<Board*> *m_archivedBoards; //归档的任务: 按原Board分类, 一一对应
+  DataHolder* m_dataHolder; //其他数据, 统一管理
 
   QString pickDataFilePathName(bool appendDate = false);
   QJsonDocument readDataFromFile();

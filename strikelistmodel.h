@@ -58,7 +58,7 @@ class StrikeListModel : public QAbstractListModel
   //信号发生
  signals:
   //void strikeArchivedBySid(QString bid, QString sid);
-  void strikeArchived(QString bid, Strike &strike);
+  void strikeArchived(QString bid, Strike strike);
 
 
 private:

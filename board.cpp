@@ -2,6 +2,7 @@
 
 #include "consts.h"
 #include <QUuid>
+#include <QtDebug>
 
 Board::Board() {
 
@@ -18,6 +19,8 @@ Board::~Board()
 {
   qDeleteAll(mItems->begin(), mItems->end());
   delete mItems;
+
+  qDebug("destructor board %s : %s", qPrintable(bid), qPrintable(title));
 }
 
 
@@ -70,8 +73,10 @@ void Board::insertNewItem(int index, QString &desc) {
         mItems->insert(index, &strike);
 }
 
+
 void Board::insertItem(Strike *strike)
 {
+  qDebug() << "insert item is " << qPrintable(strike->getSid()) << ": " << strike;
   mItems->insert(0, strike);
 }
 
