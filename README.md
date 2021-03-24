@@ -5,6 +5,8 @@
 @since 2020.5.1
 @author Felix Zhang
 
+使用QT, QML技术开发.
+
 目前功能如下:
 
 ![主界面](/doc/images/mainboards.jpg "")
