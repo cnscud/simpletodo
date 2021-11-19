@@ -43,6 +43,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     README.md \
+    doc/images/menuicon.jpg \
+    doc/images/mainboards.jpg \
+    doc/images/archived.jpg \
     qt_zh_CN.qm \
     template.json
 
